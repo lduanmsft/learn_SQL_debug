@@ -1,0 +1,14 @@
+{
+  "lab": "lab-01-wait-logbuffer",
+  "artifacts": [
+    {
+      "id": "sqldump0016",
+      "type": "sql-server-dump",
+      "path": "C:\\Users\\lduan\\debug_workshop\\log_writer\\wait_logbuffer\\SQLDump0016.mdmp",
+      "sizeBytes": 67108864,
+      "sha256": "F90503CEABEABF618E125561762051884A73C5137F1070334AEA35BADB108136",
+      "checkedIntoGit": false,
+      "purpose": "Offline WinDbg analysis of the historical LOGBUFFER reproduction"
+    }
+  ]
+}
