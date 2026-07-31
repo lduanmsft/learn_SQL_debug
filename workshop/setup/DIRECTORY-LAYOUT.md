@@ -36,6 +36,8 @@ C:\tools\
     │   └── windbgSlowRing.appinstaller
     ├── extensions\
     │   └── mex.dll
+    ├── source-server\
+    │   └── srcsrv.default.ini       # Internal; private offline bundle only
     ├── dscript\
     │   └── SQL2016\
     └── inventory.json
@@ -63,3 +65,5 @@ C:\Users\lduan\debug_workshop\log_writer\
 ```
 
 The dump is identified by the Lab 1 artifact manifest but is not committed to Git.
+
+The staged source-server INI is copied to `C:\SRC\srcsrv.default.ini` by `05-Configure-SymbolsAndSource.ps1` when the destination file does not already exist.

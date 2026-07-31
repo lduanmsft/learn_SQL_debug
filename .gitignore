@@ -8,4 +8,5 @@
 *.msixbundle
 
 workshop/**/*.dll
+workshop/**/srcsrv*.ini
 workshop/setup/inventory.json

@@ -4,6 +4,7 @@ param(
     [string]$WinDbgInstallerSource = '\\sesdfs\1Windows\TestContent\ES\dbg\dbgx\windbgSlowRing.appinstaller',
     [string]$MexSource,
     [string]$WinDbgCsPackageSource,
+    [string]$SourceServerIniSource = 'C:\SRC\srcsrv.default.ini',
     [string]$DscriptManifest = (Join-Path $PSScriptRoot 'dscript-sources.json'),
     [switch]$VerifyOnly
 )
@@ -142,6 +143,7 @@ function Stage-DscriptAssets {
 
 $installerDestination = Join-Path $DestinationRoot 'WinDbg\windbgSlowRing.appinstaller'
 $mexDestination = Join-Path $DestinationRoot 'extensions\mex.dll'
+$sourceServerIniDestination = Join-Path $DestinationRoot 'source-server\srcsrv.default.ini'
 $winDbgCsDestination = 'C:\tools\WinDbgCs.3.2.7.nupkg'
 
 if (-not $VerifyOnly) {
@@ -160,6 +162,8 @@ if (-not $VerifyOnly) {
     else {
         Copy-RequiredFile -Source $WinDbgCsPackageSource -Destination $winDbgCsDestination -Description 'WinDbgCs package'
     }
+
+    Copy-RequiredFile -Source $SourceServerIniSource -Destination $sourceServerIniDestination -Description 'Source server INI'
 
     Stage-DscriptAssets -ManifestPath $DscriptManifest
 }
@@ -190,6 +194,13 @@ if (Test-Path -LiteralPath $winDbgCsDestination -PathType Leaf) {
 }
 else {
     Write-Warning "Staged WinDbgCs package is missing: $winDbgCsDestination"
+}
+
+if (Test-Path -LiteralPath $sourceServerIniDestination -PathType Leaf) {
+    Add-InventoryItem -Component 'Source server INI' -Path $sourceServerIniDestination -Notes 'Internal configuration; private offline bundle only'
+}
+else {
+    Write-Warning "Staged source server INI is missing: $sourceServerIniDestination"
 }
 
 $installedWinDbg = Get-AppxPackage -Name $expectedWinDbgPackage -ErrorAction SilentlyContinue |

@@ -123,8 +123,9 @@ Run `setup/Prepare-WinDbgWorkshop.ps1` from PowerShell. The script:
 2. Reads the installer XML and checks that it references package `Microsoft.WinDbg.Slow` and version `1.2606.22001.1`.
 3. Copies a user-supplied `mex.dll`.
 4. Copies and inspects a user-supplied `WinDbgCs.3.2.7.nupkg`.
-5. Copies each configured version-specific `dscript` directory from `setup/dscript-sources.json`.
-6. Writes SHA-256 inventory information for reproducibility.
+5. Copies `C:\SRC\srcsrv.default.ini` to `C:\tools\SqlDebugWorkshop\source-server\srcsrv.default.ini` for the private offline bundle.
+6. Copies each configured version-specific `dscript` directory from `setup/dscript-sources.json`.
+7. Writes SHA-256 inventory information for reproducibility.
 
 The committed dscript manifest intentionally contains no invented source URLs. Fill in only approved URLs or UNC paths, then run the preparation script.
 

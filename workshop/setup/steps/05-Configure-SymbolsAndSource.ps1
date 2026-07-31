@@ -2,14 +2,20 @@
 param(
     [string]$SymbolCache = 'C:\symbol',
     [string]$SymbolServer = 'https://symweb.azurefd.net',
-    [string]$SourceServerIni = 'C:\SRC\srcsrv.default.ini'
+    [string]$SourceServerIni = 'C:\SRC\srcsrv.default.ini',
+    [string]$StagedSourceServerIni = 'C:\tools\SqlDebugWorkshop\source-server\srcsrv.default.ini'
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 if (-not (Test-Path -LiteralPath $SourceServerIni -PathType Leaf)) {
-    throw "Source server INI was not found: $SourceServerIni"
+    if (-not (Test-Path -LiteralPath $StagedSourceServerIni -PathType Leaf)) {
+        throw "Source server INI was not found at $SourceServerIni or $StagedSourceServerIni"
+    }
+
+    New-Item -ItemType Directory -Path (Split-Path -Parent $SourceServerIni) -Force | Out-Null
+    Copy-Item -LiteralPath $StagedSourceServerIni -Destination $SourceServerIni -Force
 }
 
 New-Item -ItemType Directory -Path $SymbolCache -Force | Out-Null
