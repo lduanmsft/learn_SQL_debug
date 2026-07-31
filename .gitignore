@@ -1,0 +1,11 @@
+# SQL Server debugging artifacts and internal tooling binaries
+*.mdmp
+*.dmp
+*.run
+*.nupkg
+*.appinstaller
+*.msix
+*.msixbundle
+
+workshop/**/*.dll
+workshop/setup/inventory.json

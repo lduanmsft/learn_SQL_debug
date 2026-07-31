@@ -2,6 +2,10 @@
 
 This directory contains hands-on SQL Server debugging workshops driven through WinDbg MCP.
 
+## Setup
+
+- [Prepare WinDbg Slow Ring, MEX, WinDbgCs, and versioned dscript assets](./00-environment-setup.md)
+
 ## Labs
 
 - [Lab 01 — Investigating `LOGBUFFER` waits with a SQL Server dump](./lab-01-wait-logbuffer/README.md)

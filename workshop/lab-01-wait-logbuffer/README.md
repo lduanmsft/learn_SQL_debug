@@ -43,6 +43,7 @@ After completing the lab, the learner should be able to:
 
 ## Prerequisites
 
+- Complete the shared [workshop debugger environment setup](../00-environment-setup.md).
 - Windows lab machine with SQL Server 2016 instance `SQL2016` or an explicitly substituted instance.
 - A disposable Azure Blob container supported by the SQL Server version and configuration used in the lab.
 - A freshly generated container SAS with only the permissions required by the lab.

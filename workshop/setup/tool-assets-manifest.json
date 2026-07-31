@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "verifiedOn": "2026-07-31",
+  "assets": [
+    {
+      "name": "windbgSlowRing.appinstaller",
+      "source": "\\\\sesdfs\\1Windows\\TestContent\\ES\\dbg\\dbgx\\windbgSlowRing.appinstaller",
+      "packageName": "Microsoft.WinDbg.Slow",
+      "version": "1.2606.22001.1",
+      "sha256": "D025E9FB19BB446A1D9555075175528E42B8B646F013D93F6C28CB0714CBBF13"
+    },
+    {
+      "name": "mex.dll",
+      "fileVersion": "3.1.0.243",
+      "sha256": "48795A605F4839255816C2FDCB2D0DA24C4EE4671157FA5A579560F79805F9FF"
+    },
+    {
+      "name": "WinDbgCs.3.2.7.nupkg",
+      "packageId": "WinDbgCs",
+      "version": "3.2.7",
+      "sha256": "17D3BA67239DA0FCA4A68992D856EDB3C5F5B9963EFBE4343E17485B8298EC23"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "releases": [
+    {
+      "version": "SQL2016",
+      "sourceDirectory": "C:\\tools\\dscript\\SQL2016"
+    },
+    {
+      "version": "SQL2017",
+      "sourceDirectory": ""
+    },
+    {
+      "version": "SQL2019",
+      "sourceDirectory": ""
+    },
+    {
+      "version": "SQL2022",
+      "sourceDirectory": ""
+    },
+    {
+      "version": "SQL2025",
+      "sourceDirectory": ""
+    }
+  ]
+}
