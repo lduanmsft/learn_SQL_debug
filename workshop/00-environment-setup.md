@@ -33,7 +33,59 @@ The repository contains only preparation automation and manifests. Each learner 
 
 Verified package metadata and SHA-256 values are recorded in `setup/tool-assets-manifest.json`. Revalidate the hash before using a replacement binary with the same filename.
 
-## Prepare the files
+## Ordered setup
+
+Use the [directory layout](./setup/DIRECTORY-LAYOUT.md) as the canonical placement guide. Run PowerShell as Administrator for the package-installation step.
+
+### Step 1 — Connect and validate source assets
+
+Connect to the Microsoft corporate VPN, finish copying the approved assets into `C:\tools`, and run:
+
+`workshop\setup\steps\01-Test-SourceAssets.ps1`
+
+This verifies the internal WinDbg installer, `mex.dll`, WinDbgCs package, and available versioned dscript directories before making changes.
+
+### Step 2 — Stage and hash workshop assets
+
+Run:
+
+`workshop\setup\steps\02-Stage-WorkshopAssets.ps1`
+
+This invokes `Prepare-WinDbgWorkshop.ps1` using the standard source and destination directories.
+
+### Step 3 — Install WinDbg Slow Ring
+
+Open the validated app installer from:
+
+`C:\tools\SqlDebugWorkshop\WinDbg\windbgSlowRing.appinstaller`
+
+Complete the App Installer UI and verify package `Microsoft.WinDbg.Slow` version `1.2606.22001.1`.
+
+### Step 4 — Install WinDbgCs
+
+Run:
+
+`workshop\setup\steps\03-Install-WinDbgCs.ps1`
+
+The script first checks whether `WinDbgCs` version `3.2.7` is already installed. It avoids the confusing silent reinstall behavior and verifies the package after installation.
+
+### Step 5 — Verify the complete environment
+
+Run:
+
+`workshop\setup\steps\04-Test-Installation.ps1`
+
+Do not continue until every row passes.
+
+### Step 6 — Open the dump and load extensions
+
+Open the Lab 1 dump in WinDbg, then execute the commands from:
+
+`workshop\setup\steps\05-WinDbg-Load-Commands.txt`
+
+Use `.chain` output to verify both extensions loaded successfully before beginning the investigation.
+
+## Preparation script details
 
 Run `setup/Prepare-WinDbgWorkshop.ps1` from PowerShell. The script:
 
@@ -41,7 +93,7 @@ Run `setup/Prepare-WinDbgWorkshop.ps1` from PowerShell. The script:
 2. Reads the installer XML and checks that it references package `Microsoft.WinDbg.Slow` and version `1.2606.22001.1`.
 3. Copies a user-supplied `mex.dll`.
 4. Copies and inspects a user-supplied `WinDbgCs.3.2.7.nupkg`.
-5. Downloads or copies each configured `dscript` asset from `setup/dscript-sources.json`.
+5. Copies each configured version-specific `dscript` directory from `setup/dscript-sources.json`.
 6. Writes SHA-256 inventory information for reproducibility.
 
 The committed dscript manifest intentionally contains no invented source URLs. Fill in only approved URLs or UNC paths, then run the preparation script.

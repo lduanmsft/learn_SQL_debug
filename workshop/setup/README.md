@@ -2,6 +2,17 @@
 
 Use `Prepare-WinDbgWorkshop.ps1` to stage and verify local debugger prerequisites without committing binaries to Git.
 
+Follow the numbered scripts in `steps` for the learner workflow:
+
+1. `01-Test-SourceAssets.ps1`
+2. `02-Stage-WorkshopAssets.ps1`
+3. Install WinDbg with the staged app installer.
+4. `03-Install-WinDbgCs.ps1`
+5. `04-Test-Installation.ps1`
+6. Run `05-WinDbg-Load-Commands.txt` inside WinDbg.
+
+See `DIRECTORY-LAYOUT.md` for the required Git, `C:\tools`, PackageManagement, and dump directories.
+
 ## Inputs
 
 - Internal `windbgSlowRing.appinstaller` share path, configurable with `-WinDbgInstallerSource`.
