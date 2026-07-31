@@ -34,6 +34,13 @@ foreach ($entry in $paths) {
     })
 }
 
+$sourceServerIni = [Environment]::GetEnvironmentVariable('SRCSRV_INI_FILE', 'User')
+$checks.Add([pscustomobject]@{
+    Component = 'Source server INI'
+    Passed = $sourceServerIni -eq 'C:\SRC\srcsrv.default.ini' -and (Test-Path -LiteralPath $sourceServerIni -PathType Leaf)
+    Detail = if ([string]::IsNullOrWhiteSpace($sourceServerIni)) { 'SRCSRV_INI_FILE is not set for the current user' } else { $sourceServerIni }
+})
+
 $checks | Format-Table -AutoSize
 if ($checks.Passed -contains $false) {
     throw 'Workshop installation verification failed. Resolve every failed row before opening the lab dump.'

@@ -9,7 +9,8 @@ Follow the numbered scripts in `steps` for the learner workflow:
 3. Install WinDbg with the staged app installer.
 4. `03-Install-WinDbgCs.ps1`
 5. `04-Test-Installation.ps1`
-6. Run `05-WinDbg-Load-Commands.txt` inside WinDbg.
+6. Run `05-Configure-SymbolsAndSource.ps1`, then restart WinDbg.
+7. Run `06-WinDbg-Load-Commands.txt` inside WinDbg.
 
 See `DIRECTORY-LAYOUT.md` for the required Git, `C:\tools`, PackageManagement, and dump directories.
 

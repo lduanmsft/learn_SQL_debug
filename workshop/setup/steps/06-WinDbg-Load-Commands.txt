@@ -1,0 +1,13 @@
+$$ Run these commands in the WinDbg command window after opening the Lab 1 dump.
+
+$$ Verify the symbol path inherited/configured for this session.
+.sympath
+
+.load C:\tools\SqlDebugWorkshop\extensions\mex.dll
+.load C:\Program Files\PackageManagement\NuGet\Packages\WinDbgCs.3.2.7\WinDbgCsExt.dll
+
+$$ Confirm extension registration. Review output for load errors.
+.chain
+
+$$ Do not run a dscript command until the SQL Server build has been confirmed
+$$ and the matching version-specific dscript workflow has been validated.

@@ -77,19 +77,49 @@ Run:
 
 Do not continue until every row passes.
 
-### Step 6 — Open the dump and load extensions
+### Step 6 — Configure symbols and source server
+
+The validated environment uses:
+
+- Symbol cache: `C:\symbol`
+- Symbol server: `https://symweb.azurefd.net`
+- Source server INI: `C:\SRC\srcsrv.default.ini`
+
+Run the idempotent configuration script:
+
+`workshop\setup\steps\05-Configure-SymbolsAndSource.ps1`
+
+Persist the source-server INI for the current Windows user, then restart WinDbg so the newly launched process inherits it:
+
+`[Environment]::SetEnvironmentVariable('SRCSRV_INI_FILE', 'C:\SRC\srcsrv.default.ini', 'User')`
+
+Set it for the current PowerShell process as well when immediate verification is required:
+
+`$env:SRCSRV_INI_FILE = 'C:\SRC\srcsrv.default.ini'`
+
+Verify it with:
+
+`[Environment]::GetEnvironmentVariable('SRCSRV_INI_FILE', 'User')`
+
+Do not set the machine scope unless all users on the machine should share the same source-server configuration and the change has been approved.
+
+### Step 7 — Open the dump and load extensions
 
 Open the Lab 1 dump in WinDbg, then execute the commands from:
 
-`workshop\setup\steps\05-WinDbg-Load-Commands.txt`
+`workshop\setup\steps\06-WinDbg-Load-Commands.txt`
 
 Use `.chain` output to verify both extensions loaded successfully before beginning the investigation.
+
+Inside WinDbg, use `.sympath` to verify the active symbol path. The validated path is:
+
+`srv*C:\symbol*https://symweb.azurefd.net;cache*C:\symbol;srv*https://symweb.azurefd.net`
 
 ## Preparation script details
 
 Run `setup/Prepare-WinDbgWorkshop.ps1` from PowerShell. The script:
 
-1. Copies the WinDbg Slow Ring app installer from the internal share.
+1. Copies the WinDbg Slow Ring app installer from `\\sesdfs\1Windows\TestContent\ES\dbg\dbgx\windbgSlowRing.appinstaller` to `C:\tools\SqlDebugWorkshop\WinDbg\windbgSlowRing.appinstaller`.
 2. Reads the installer XML and checks that it references package `Microsoft.WinDbg.Slow` and version `1.2606.22001.1`.
 3. Copies a user-supplied `mex.dll`.
 4. Copies and inspects a user-supplied `WinDbgCs.3.2.7.nupkg`.
