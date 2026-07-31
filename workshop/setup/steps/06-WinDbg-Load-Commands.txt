@@ -1,4 +1,4 @@
-$$ Run these commands in the WinDbg command window after opening the Lab 1 dump.
+$$ Run each command separately only after the Lab 1 dump is open and WinDbg MCP is connected to that exact session.
 
 $$ Verify the symbol path inherited/configured for this session.
 .sympath

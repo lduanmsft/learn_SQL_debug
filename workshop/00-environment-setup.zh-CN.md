@@ -234,7 +234,16 @@ C:\Users\lduan\debug_workshop\log_writer\wait_logbuffer\SQLDump0016.mdmp
 
 等待 dump 和初始 symbols 加载完成。
 
-使用 `.sympath` 检查当前 session 的 symbol path。已经验证过的 WinDbg session path 为：
+接下来必须先通过 WinDbg MCP 完成 runtime gate：
+
+1. 列出当前可用的 WinDbg sessions。
+2. 根据 window title 选择打开了上述 Lab 1 dump 的 session。
+3. 连接该 session。
+4. 读取 debugger output history，确认历史中显示的 dump 路径与目标 dump 一致。
+
+在 WinDbg MCP 成功连接并确认目标 dump 之前，只能把 MEX/WinDbgCs 记为“文件已存在”；不能报告扩展已经加载。
+
+连接完成后，使用 `.sympath` 作为一次独立的 WinDbg MCP 命令检查当前 session 的 symbol path。已经验证过的 WinDbg session path 为：
 
 ```text
 srv*C:\symbol*https://symweb.azurefd.net;cache*C:\symbol;srv*https://symweb.azurefd.net

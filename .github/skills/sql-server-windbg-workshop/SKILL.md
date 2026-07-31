@@ -68,7 +68,7 @@ Read only the files needed for the current step:
 5. For symbol/source failures, read WinDbg application logs first.
 6. Execute individual read-only commands and record their exact output or a faithful summary.
 7. Before switching thread, frame, or exception context, record the current context and explain the change.
-8. Verify extensions with `.chain`; do not infer successful loading from file existence.
+8. Check runtime extensions only after the target dump is open and WinDbg MCP is connected to that exact session. Then load MEX and WinDbgCs with two separate `.load` executions and verify both with a separate `.chain`; file existence or installation alone is not runtime readiness.
 9. Disconnect when the session is complete if no further debugger work is requested.
 
 ## Known validated configuration

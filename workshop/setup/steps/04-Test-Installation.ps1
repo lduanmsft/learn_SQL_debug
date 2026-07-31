@@ -20,8 +20,8 @@ $checks.Add([pscustomobject]@{
 
 $paths = @(
     [pscustomobject]@{ Component = 'Staged app installer'; Path = Join-Path $StagingRoot 'WinDbg\windbgSlowRing.appinstaller' },
-    [pscustomobject]@{ Component = 'Staged MEX'; Path = Join-Path $StagingRoot 'extensions\mex.dll' },
-    [pscustomobject]@{ Component = 'WinDbgCs extension'; Path = 'C:\Program Files\PackageManagement\NuGet\Packages\WinDbgCs.3.2.7\WinDbgCsExt.dll' },
+    [pscustomobject]@{ Component = 'MEX file present (not runtime-loaded)'; Path = Join-Path $StagingRoot 'extensions\mex.dll' },
+    [pscustomobject]@{ Component = 'WinDbgCs DLL present (not runtime-loaded)'; Path = 'C:\Program Files\PackageManagement\NuGet\Packages\WinDbgCs.3.2.7\WinDbgCsExt.dll' },
     [pscustomobject]@{ Component = 'SQL2016 dscript'; Path = Join-Path $StagingRoot 'dscript\SQL2016' },
     [pscustomobject]@{ Component = 'Staged source server INI'; Path = Join-Path $StagingRoot 'source-server\srcsrv.default.ini' },
     [pscustomobject]@{ Component = 'Asset inventory'; Path = Join-Path $StagingRoot 'inventory.json' }

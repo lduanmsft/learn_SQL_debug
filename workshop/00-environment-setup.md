@@ -105,15 +105,20 @@ Verify it with:
 
 Do not set the machine scope unless all users on the machine should share the same source-server configuration and the change has been approved.
 
-### Step 7 — Open the dump and load extensions
+### Step 7 — Open the dump, connect WinDbg MCP, and load extensions
 
-Open the Lab 1 dump in WinDbg, then execute the commands from:
+Open the Lab 1 dump in WinDbg and wait for initial loading. Then:
 
-`workshop\setup\steps\06-WinDbg-Load-Commands.txt`
+1. List WinDbg MCP sessions.
+2. Select and connect to the session whose window title identifies the Lab 1 dump.
+3. Read debugger output history and confirm the opened dump path matches the target artifact.
+4. Run `.sympath` as one standalone WinDbg MCP command.
+5. Run each `.load` from `workshop\setup\steps\06-WinDbg-Load-Commands.txt` as a separate WinDbg MCP execution.
+6. Run `.chain` as another separate execution and verify both exact extension paths.
 
-Use `.chain` output to verify both extensions loaded successfully before beginning the investigation.
+Until the dump session is connected and `.chain` verifies the extensions, report only that the DLL files are present—not that MEX or WinDbgCs is runtime-loaded.
 
-Inside WinDbg, use `.sympath` to verify the active symbol path. The validated path is:
+The validated symbol path is:
 
 `srv*C:\symbol*https://symweb.azurefd.net;cache*C:\symbol;srv*https://symweb.azurefd.net`
 

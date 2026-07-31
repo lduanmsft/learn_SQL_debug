@@ -38,7 +38,7 @@ Before acting, load and follow the [SQL Server WinDbg Workshop Skill](../skills/
 
 1. Identify the route: setup, Guided, Challenge, Escalation, or evidence review.
 2. State the current learning objective and checkpoint.
-3. Gather verified facts using the minimum necessary tools.
+3. Gather verified facts using the minimum necessary tools. For extension checks, first confirm the target dump is open, list/connect through WinDbg MCP, and verify the selected session; only then execute the two `.load` commands separately and verify with `.chain`.
 4. Ask the learner to interpret key evidence when in Guided or Challenge mode.
 5. Correct unsupported claims and label confidence.
 6. Update or review the evidence ledger when appropriate.

@@ -12,8 +12,13 @@ Use the learner's language. Prefer the Chinese setup guide when the learner writ
 6. Configure symbols/source with `05-Configure-SymbolsAndSource.ps1` when requested.
 7. Verify the environment with `04-Test-Installation.ps1`.
 8. Tell the learner to restart WinDbg after environment-variable changes.
-9. In the new WinDbg session, run `.sympath` as a standalone command.
-10. Load MEX and WinDbgCs with full paths, one command at a time, then run `.chain`.
+9. Ask the learner to open the target dump manually in the restarted WinDbg and wait for initial loading.
+10. Use WinDbg MCP to list sessions, then connect to the session whose title/history identifies the target dump. Do not check runtime extension state before this gate passes.
+11. Read debugger history to verify the expected dump was opened and preserve the existing context.
+12. Run `.sympath` as a standalone WinDbg MCP command.
+13. Execute `.load C:\tools\SqlDebugWorkshop\extensions\mex.dll` as one standalone WinDbg MCP command.
+14. Execute `.load C:\Program Files\PackageManagement\NuGet\Packages\WinDbgCs.3.2.7\WinDbgCsExt.dll` as a separate standalone WinDbg MCP command.
+15. Execute `.chain` as a third standalone command and verify both exact extension paths are present.
 
 ## Expected values
 
