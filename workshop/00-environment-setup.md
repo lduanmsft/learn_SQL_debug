@@ -77,6 +77,16 @@ If a different approved package is provided later and its `.nuspec` reports `Win
 
 The documented command was preflighted with `Find-Package` against `C:\tools`; PackageManagement successfully discovered package `WinDbgCs` version `3.2.7` through the NuGet provider.
 
+`Install-Package` may complete successfully without printing a success message. Verify installation explicitly:
+
+`Get-Package -Name WinDbgCs -RequiredVersion 3.2.7 -ProviderName NuGet`
+
+For the machine used to validate this workshop, the package was installed at:
+
+`C:\Program Files\PackageManagement\NuGet\Packages\WinDbgCs.3.2.7`
+
+Confirm that `WinDbgCsExt.dll` and its dependencies exist in that directory before loading the extension in WinDbg. If the original PowerShell window still does not return to a prompt after `Get-Package` reports the package as installed, interrupt that waiting invocation with `Ctrl+C`; do not run a second installation until the installed-package check is complete.
+
 ## Load MEX
 
 After opening the dump in WinDbg, load the staged extension from:
