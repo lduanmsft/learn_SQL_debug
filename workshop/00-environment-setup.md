@@ -2,6 +2,8 @@
 
 This workshop uses an internal WinDbg Slow Ring build plus SQL Server debugging extensions. The setup assets are not committed to Git.
 
+Chinese version: [Workshop 环境配置](./00-environment-setup.zh-CN.md)
+
 ## Required components
 
 | Component | Required value | Default staging location |
