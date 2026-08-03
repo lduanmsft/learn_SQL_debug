@@ -41,9 +41,14 @@ Prepare local assets, install debugger components, and verify symbol/source conf
 
 Use the [directory layout](./setup/DIRECTORY-LAYOUT.md) as the canonical placement guide. Run PowerShell as Administrator for the package-installation step.
 
-## Step 1 — Connect and validate source assets
+## Step 1 — Connect to VPN and start SQL Server WinDbg Instructor
 
-Connect to the Microsoft corporate VPN, finish copying the approved assets into `C:\tools`, and run:
+1. Connect to the Microsoft corporate VPN and confirm access to the internal share.
+2. In the VS Code Chat Agent picker, select **SQL Server WinDbg Instructor**. Its customization is stored in [sql-server-windbg-instructor.agent.md](../.github/agents/sql-server-windbg-instructor.agent.md); do not execute that Markdown file as a script.
+3. Enter: `Validate the workshop environment and guide me through Setup in order`.
+4. The Agent orchestrates the documented sequence, runs side-effect-free validation, and explains evidence. Software installation, asset staging, and persistent configuration changes still require an explicit learner request.
+
+The Agent first runs the actual source-assets validation script from the repository root:
 
 `workshop\setup\steps\01-Test-SourceAssets.ps1`
 
@@ -73,13 +78,20 @@ Run:
 
 The script first checks whether `WinDbgCs` version `3.2.7` is already installed. It avoids the confusing silent reinstall behavior and verifies the package after installation.
 
-## Step 5 — Verify the complete environment
+## Step 5 — Have the Agent run the complete-environment validation script
 
-Run:
+This is not a choice between using the Agent and using the script:
+
+- **SQL Server WinDbg Instructor** provides teaching, ordering, and evidence interpretation.
+- `04-Test-Installation.ps1` is the deterministic mechanism that performs the environment checks.
+
+Ask the Agent to run:
 
 `workshop\setup\steps\04-Test-Installation.ps1`
 
-Do not continue until every row passes.
+If the current Chat cannot execute local commands, run the same script manually from the repository root and provide its complete output to the Agent. Do not continue until every row passes.
+
+The Agent records `Observation`, `Evidence`, `Interpretation`, `Confidence`, `Does not prove`, and `Next checkpoint`. A passing script proves only that local prerequisites are ready; it does not prove that the dump is open, MCP is connected, or either extension is runtime-loaded. Phase 2 must prove those facts again.
 
 ## Step 6 — Configure symbols and source server
 
