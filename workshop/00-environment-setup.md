@@ -294,7 +294,10 @@ After the manual sequence is understood:
 
 1. Select **SQL Server WinDbg Instructor**.
 2. In **Configure Tools**, check the complete `DbgX.Mcp.Proxy` group, including `list_sessions`, `connect_session`, `show_output`, and `get_output_history`. Row highlighting alone is not selection.
-3. Run [WinDbg MCP Log Writer Demo](../.github/prompts/windbg-mcp-logwriter-demo.prompt.md) from Chat `/` completion or **Chat: Run Prompt...**.
+3. Run the Prompt using either method below; do not launch it by clicking a Markdown file link:
+	- Type `/` in the Chat input and select **WinDbg MCP Log Writer Demo** from the Prompt list.
+	- Open the Command Palette, run **Chat: Run Prompt...**, and select **WinDbg MCP Log Writer Demo**.
+	- To inspect its contents, press `Ctrl+P` and enter `.github/prompts/windbg-mcp-logwriter-demo.prompt.md`; opening the source file does not run the Prompt.
 4. Require the Prompt to revalidate current session state and execute separate commands in this fixed order: MEX `.load` → WinDbgCs `.load` → `.chain` → `!us logwriter` → runtime-returned thread selection → `k` → `!mex.t -raw`.
 5. Compare each automated checkpoint with the manual baseline.
 

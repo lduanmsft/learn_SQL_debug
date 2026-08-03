@@ -446,7 +446,10 @@ lmv m sqlservr
 
 1. 在 Agent picker 中选择 **SQL Server WinDbg Instructor**。
 2. 在 **Configure Tools** 中勾选完整的 `DbgX.Mcp.Proxy` 工具组，至少包括 `list_sessions`、`connect_session`、`show_output` 和 `get_output_history`。蓝色高亮不等于已勾选。
-3. 从 Chat `/` 菜单或 **Chat: Run Prompt...** 运行 [WinDbg MCP Log Writer Demo](../.github/prompts/windbg-mcp-logwriter-demo.prompt.md)。
+3. 使用以下任一种方式运行 Prompt；不要通过 Markdown 文件链接启动：
+    - 在 Chat 输入框中输入 `/`，从 Prompt 列表选择 **WinDbg MCP Log Writer Demo**。
+    - 打开 Command Palette，运行 **Chat: Run Prompt...**，再选择 **WinDbg MCP Log Writer Demo**。
+    - 如需查看 Prompt 内容，按 `Ctrl+P` 并输入 `.github/prompts/windbg-mcp-logwriter-demo.prompt.md`；打开源文件不会启动 Prompt。
 4. Prompt 必须重新验证当前 session，不能复用上一次 Chat 的 PID、thread ID 或 extension 状态。
 5. Prompt 通过 MCP 按固定顺序分别执行：MEX `.load` → WinDbgCs `.load` → `.chain` → `!us logwriter` → 本次返回的 thread selection → `k` → `!mex.t -raw`。
 6. 对照 Prompt 输出和手工基线，确认 target session、两个 extension path、Log Writer thread，以及两种 stack view 的证据一致。

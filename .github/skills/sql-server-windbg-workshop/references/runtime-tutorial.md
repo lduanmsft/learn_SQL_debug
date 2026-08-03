@@ -228,7 +228,7 @@ Run this only after the learner understands the preceding manual commands. The o
 
 ### Invoke the reusable Prompt
 
-Run [WinDbg MCP Log Writer Demo](../../../prompts/windbg-mcp-logwriter-demo.prompt.md) from Chat `/` completion or **Chat: Run Prompt...**. The Prompt instructs the Agent to:
+Run **WinDbg MCP Log Writer Demo** by typing `/` in the Chat input and selecting it from the Prompt list, or by running **Chat: Run Prompt...** from the Command Palette and selecting it there. Do not use the Markdown source file as an execution action. To review its contents, use Quick Open (`Ctrl+P`) and enter `.github/prompts/windbg-mcp-logwriter-demo.prompt.md`. The Prompt instructs the Agent to:
 
 1. List and verify the target dump session.
 2. Execute the MEX and WinDbgCs `.load` commands separately.
