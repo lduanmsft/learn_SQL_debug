@@ -45,9 +45,10 @@ Use the [directory layout](./setup/DIRECTORY-LAYOUT.md) as the canonical placeme
 
 1. Connect to the Microsoft corporate VPN and confirm access to the internal share.
 2. In the VS Code Chat Agent picker, select **SQL Server WinDbg Instructor**.
-3. Enter: `Start from the beginning in manual teaching mode. Present one checkpoint at a time and wait for me to run it and return the output.`
-4. In **manual teaching mode**, Chat explains the current step and command but does not execute it for you. After you run the command and paste its output, Chat interprets the evidence and presents the next checkpoint.
-5. Automated execution starts only when you explicitly run **WinDbg MCP Log Writer Demo**.
+3. Enter: `Start the workshop from the beginning. Automate preparation before the dump, then begin manual teaching at “Open the dump and connect WinDbg MCP”.`
+4. The Agent automatically runs Phase 1 prerequisite scripts and skips installation or configuration already proven complete. It pauses when WinDbg must release MEX, App Installer UI is required, an approved asset is missing, or a persistent configuration change needs confirmation.
+5. After Phase 1 passes, the Agent stops at “Open the dump”. **Manual teaching mode** starts there: Chat presents one checkpoint and waits for your result before continuing.
+6. Automated debugger execution starts only when you explicitly run **WinDbg MCP Log Writer Demo**.
 
 The environment check runs this source-assets script from the repository root:
 
@@ -124,6 +125,8 @@ Do not set the machine scope unless all users on the machine should share the sa
 # Phase 2: Open the dump and connect WinDbg MCP
 
 Phase 1 proves that local files, packages, and environment values are ready. Phase 2 proves that the target dump is open in WinDbg, MCP is connected to the exact session, and the extensions are runtime-loaded. Execute one debugger command per WinDbg MCP execution; never combine adjacent checkpoints.
+
+**Manual teaching mode starts here.** The Agent presents one checkpoint and pauses. Complete the action and return the result before requesting the next step. The Agent does not execute WinDbg MCP commands unless you explicitly request that checkpoint or run the Prompt demo.
 
 When reading each checkpoint, focus on:
 

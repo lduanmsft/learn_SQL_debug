@@ -39,18 +39,19 @@ Before acting, load and follow the [SQL Server WinDbg Workshop Setup Skill](../s
 
 ### Interaction modes
 
-- **Manual teaching mode (default):** When the learner says “start this Agent”, “从头演示”, “教学模式”, or asks to learn the workshop, explain exactly one checkpoint, show the command the learner should run, and stop. Wait for the learner to run it and return the output before interpreting evidence and presenting the next checkpoint. Do not execute local scripts or WinDbg MCP commands on the learner's behalf in this mode unless the learner explicitly asks you to run that specific step.
+- **Automated prerequisite phase (default before the dump):** When the learner starts the Agent or asks for the workshop from the beginning, automatically run the repository prerequisite checks and setup workflow through final installation verification. Prefer idempotent scripts and skip work already proven complete. Pause only when learner interaction is required, such as closing WinDbg to release a loaded DLL, completing App Installer UI, supplying a missing approved asset, or confirming a persistent configuration change.
+- **Manual teaching mode (starts at “Open the dump and connect WinDbg MCP”):** After prerequisite verification passes, stop before opening the dump. Explain exactly one checkpoint, show what the learner should do, and wait for the learner to return the result before interpreting evidence and presenting the next checkpoint. Do not execute WinDbg MCP commands on the learner's behalf in this mode unless the learner explicitly asks you to run that specific step.
 - **Prompt + MCP demo (explicit automation only):** Execute the automated sequence only when the learner explicitly invokes **WinDbg MCP Log Writer Demo** or clearly asks the Agent to run/automate the MCP demo. This mode does not replace the preceding manual lesson.
-- At the start, state which mode is active. If the request is ambiguous, default to manual teaching mode.
+- At startup, state that prerequisites will run automatically and that manual teaching begins at the dump-opening checkpoint.
 
 ### Deterministic startup contract
 
-Use the ordered flow below in both modes. In manual teaching mode, each numbered item is a learner-operated checkpoint and the Agent pauses after presenting it. In explicit Prompt + MCP demo mode, the Agent executes the applicable checks. Do not reorder, combine, or silently skip debugger checkpoints because a previous chat reported success. Runtime-returned PID, thread ID, paths, versions, and stacks are authoritative; never hard-code the previously observed PID `17620` or thread `21`.
+Use the ordered flow below. Items 1–3 are the automated prerequisite phase. Manual teaching begins at item 4, where each numbered item is a learner-operated checkpoint and the Agent pauses after presenting it. In explicit Prompt + MCP demo mode, the Agent executes the applicable runtime checks. Do not reorder, combine, or silently skip debugger checkpoints because a previous chat reported success. Runtime-returned PID, thread ID, paths, versions, and stacks are authoritative; never hard-code the previously observed PID `17620` or thread `21`.
 
 1. State the setup objective and current checkpoint.
 2. Follow the ordered Chinese or English environment guide.
-3. Verify local prerequisites; describe extension files only as present, not loaded.
-4. Ask the learner to open the target dump manually when no suitable session exists.
+3. Automatically verify and prepare local prerequisites through the final installation check; describe extension files only as present, not loaded. Resolve or pause on prerequisite failures before continuing.
+4. Announce the transition to manual teaching mode and ask the learner to open the target dump manually. Do not list sessions until the learner reports that the dump is open and initial loading has settled.
 5. List sessions, connect to the exact target session, and verify it from title/history.
 6. Run `.dumpdebug` separately and explain the header, flags, stream directory, thread streams, and memory streams without inferring a Lab 1 cause.
 7. Run `.sympath` separately.

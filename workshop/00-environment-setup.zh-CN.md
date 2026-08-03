@@ -85,9 +85,10 @@ WinDbg installer 的 Microsoft 内部来源为：
 
 1. 连接 Microsoft corporate VPN，并确认当前账户具有内部共享目录权限。
 2. 在 VS Code Chat 的 Agent picker 中选择 **SQL Server WinDbg Instructor**。
-3. 输入：`从头开始教学模式，一次只讲一个 checkpoint，等我手工执行并返回输出后再继续`。
-4. 此时进入**手工教学模式**：Chat 只说明当前步骤和命令，不会替你自动执行。你完成当前命令并粘贴输出后，Chat 才解释证据并给出下一步。
-5. 只有在你明确运行 **WinDbg MCP Log Writer Demo** 时，才进入自动 Prompt + MCP 演示。
+3. 输入：`从头启动 Workshop；自动完成打开 Dump 之前的准备，从“打开 Dump 并连接 WinDbg MCP”开始手工教学`。
+4. Agent 自动执行阶段一的 prerequisite scripts，并跳过已经验证完成的安装或配置。遇到 WinDbg 占用 MEX、需要 App Installer UI、缺少 approved asset 或需要确认持久配置变更时，会暂停并请你处理。
+5. 阶段一全部通过后，Agent 停在“打开 Dump”步骤。此后进入**手工教学模式**：Chat 一次只说明一个 checkpoint，等你操作并返回结果后再继续。
+6. 只有在你明确运行 **WinDbg MCP Log Writer Demo** 时，才进入自动 Prompt + MCP debugger 演示。
 
 环境检查会在仓库根目录运行以下 source-assets 脚本：
 
@@ -247,6 +248,8 @@ C:\tools\SqlDebugWorkshop\source-server\srcsrv.default.ini
 # 阶段二：打开 Dump 并连接 WinDbg MCP
 
 阶段一只证明本地文件、package 和环境变量已经准备好；阶段二才证明目标 dump 已在 WinDbg 中打开、MCP 已连接到准确 session，并且 extension 已在该 runtime 中加载。每个 debugger command 必须单独执行，不能把相邻命令合并为一次 MCP execution。
+
+**教学模式从这里开始。** Agent 会先给出当前 checkpoint，然后暂停；请完成操作并返回结果，再获取下一步。Agent 不会自动执行 WinDbg MCP command，除非你明确要求执行该 checkpoint 或运行 Prompt demo。
 
 阅读每个 checkpoint 时，请关注：
 

@@ -4,6 +4,8 @@ Use the learner's language. Prefer the Chinese setup guide when the learner writ
 
 ## Procedure
 
+Steps 1–8 are the automated prerequisite phase. Run idempotent checks automatically, skip work already proven complete, and pause only for required learner interaction or approval. Manual teaching mode begins at step 9: present one checkpoint, wait for the learner to complete it and return the result, then continue. Do not execute WinDbg MCP commands automatically unless the learner explicitly invokes the Prompt demo or asks for that debugger checkpoint to be run.
+
 1. Read the applicable setup guide under `workshop`.
 2. Check source assets with `workshop/setup/steps/01-Test-SourceAssets.ps1`.
 3. Stage assets with `02-Stage-WorkshopAssets.ps1` only when requested.
