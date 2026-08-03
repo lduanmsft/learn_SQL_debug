@@ -15,10 +15,24 @@ Use the learner's language. Prefer the Chinese setup guide when the learner writ
 9. Ask the learner to open the target dump manually in the restarted WinDbg and wait for initial loading.
 10. Use WinDbg MCP to list sessions, then connect to the session whose title/history identifies the target dump. Do not check runtime extension state before this gate passes.
 11. Read debugger history to verify the expected dump was opened and preserve the existing context.
-12. Run `.sympath` as a standalone WinDbg MCP command.
-13. Execute `.load C:\tools\SqlDebugWorkshop\extensions\mex.dll` as one standalone WinDbg MCP command.
-14. Execute `.load C:\Program Files\PackageManagement\NuGet\Packages\WinDbgCs.3.2.7\WinDbgCsExt.dll` as a separate standalone WinDbg MCP command.
-15. Execute `.chain` as a third standalone command and verify both exact extension paths are present.
+12. Run `.dumpdebug` as a standalone command. Explain the header, dump flags, stream directory, thread streams, and memory streams; do not treat stream presence as proof that every address is readable.
+13. Run `.sympath` as a standalone WinDbg MCP command.
+14. Execute `.load C:\tools\SqlDebugWorkshop\extensions\mex.dll` as one standalone WinDbg MCP command.
+15. Execute `.load C:\Program Files\PackageManagement\NuGet\Packages\WinDbgCs.3.2.7\WinDbgCsExt.dll` as a separate standalone WinDbg MCP command.
+16. Execute `.chain` as a third standalone command and verify both exact extension paths are present.
+17. Teach native command logging with separate `.logopen`, `.logfile`, and `.logclose` commands when requested.
+18. Use `!mex.help` separately for current-version command discovery; do not invent MEX commands.
+19. Avoid unfiltered `!mex.us`; execute `!us logwriter` separately to find matching Log Writer threads.
+20. Preserve the returned thread identifiers and follow only a thread-selection link/command returned by MEX.
+21. Execute native `k` separately for the selected debugger thread, then execute `!mex.t -raw` separately for the MEX raw view. Compare only the runtime output: `k` uses WinDbg's current debugger context; `!mex.t -raw` is MEX-provided and may present/unwind the stack differently. Neither command adds memory to the dump. Do not diagnose the stack in Setup.
+22. Verify `sqlservr.exe` with `lmv m sqlservr` before dscript initialization.
+23. Execute bare `!execute` separately to enumerate the scripts/help already exposed by the current WinDbgCs runtime.
+24. Preserve that output and use only runtime-advertised script links and syntax.
+25. Execute `!execute ExternalScripts.Install ;` only if the action is explicitly advertised and the required scripts are not already loaded.
+26. Redirect diagnostic dscript execution and interpretation to `agent_lab1`.
+27. After the learner completes and understands the manual sequence, invoke `WinDbg MCP Log Writer Demo` from `.github/prompts/windbg-mcp-logwriter-demo.prompt.md`.
+28. Confirm `DbgX.Mcp.Proxy` tools are selected for the custom Agent, especially `list_sessions`, `connect_session`, `show_output`, and `get_output_history`.
+29. Compare the Prompt + MCP evidence with the manual baseline for session verification, both `.load` commands, `.chain`, `!us logwriter`, thread selection, `k`, and `!mex.t -raw`. A demo passes only when the runtime evidence agrees; do not diagnose the stack in Setup.
 
 ## Expected values
 

@@ -122,6 +122,30 @@ The validated symbol path is:
 
 `srv*C:\symbol*https://symweb.azurefd.net;cache*C:\symbol;srv*https://symweb.azurefd.net`
 
+### Step 8 — Establish the manual Log Writer stack baseline
+
+After `.chain` succeeds, teach the learner to run each command separately:
+
+1. Run `!mex.help` and use only syntax advertised by the loaded MEX version.
+2. Run `!us logwriter`; do not start with unfiltered `!mex.us`.
+3. Record the thread ID and `SQLServerLogMgr::LogWriter` frame returned by this execution.
+4. Select only the runtime-returned thread link/ID; do not hard-code an example thread.
+5. Run native `k` and preserve the WinDbg-unwound call chain.
+6. Run `!mex.t -raw` and preserve the MEX stack-pointer-to-base scan.
+7. Compare the outputs: `k` is an unwind call chain, while symbolized addresses in `!mex.t -raw` are not all proven frames.
+
+### Step 9 — Reproduce the baseline with Prompt + WinDbg MCP
+
+After the manual sequence is understood:
+
+1. Select **SQL Server WinDbg Instructor**.
+2. In **Configure Tools**, check the complete `DbgX.Mcp.Proxy` group, including `list_sessions`, `connect_session`, `show_output`, and `get_output_history`. Row highlighting alone is not selection.
+3. Run [WinDbg MCP Log Writer Demo](../.github/prompts/windbg-mcp-logwriter-demo.prompt.md) from Chat `/` completion or **Chat: Run Prompt...**.
+4. Require the Prompt to revalidate current session state and execute separate commands in this fixed order: MEX `.load` → WinDbgCs `.load` → `.chain` → `!us logwriter` → runtime-returned thread selection → `k` → `!mex.t -raw`.
+5. Compare each automated checkpoint with the manual baseline.
+
+“Same result” means the same command order, runtime gates, evidence types, and report structure—not hard-coded dynamic values. The validated `SQLDump0016.mdmp` comparison baseline is MEX `3.1.0.243`, WinDbgCs `3.2.7`, and one matching thread containing `SQLServerLogMgr::LogWriter`; every new run must independently prove those observations or report the difference.
+
 ## Preparation script details
 
 Run `setup/Prepare-WinDbgWorkshop.ps1` from PowerShell. The script:

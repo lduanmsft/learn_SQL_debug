@@ -312,6 +312,31 @@ C:\Program Files\PackageManagement\NuGet\Packages\WinDbgCs.3.2.7\WinDbgCsExt.dll
 
 在 `.chain` 验证通过之前，不要依赖 MEX 或 WinDbgCs 的命令输出。
 
+### Step 11：手工建立 Log Writer stack 基线
+
+完成 `.chain` 验证后，学员先逐条手工执行以下步骤。每个命令必须单独运行：
+
+1. 执行 `!mex.help`，确认当前 MEX 版本实际提供的语法。
+2. 执行 `!us logwriter`，不要使用输出量很大的无过滤 `!mex.us`。
+3. 记录本次输出返回的 debugger thread ID 和 `SQLServerLogMgr::LogWriter` frame。
+4. 仅使用本次输出返回的 thread link/ID 切换 thread；不得把示例 thread ID 固化到课程。
+5. 执行 native `k`，保存 WinDbg unwind call chain。
+6. 执行 `!mex.t -raw`，保存 MEX 从 stack pointer 到 stack base 的 raw scan。
+7. 对比两者：`k` 是经过 unwind 的 call chain；`!mex.t -raw` 中可符号化的地址不一定都是有效 frame。
+
+### Step 12：Prompt + WinDbg MCP 自动复现
+
+手工基线讲解完成后，再演示 Prompt 自动化，不能用 Prompt 代替学员理解前面的命令：
+
+1. 在 Agent picker 中选择 **SQL Server WinDbg Instructor**。
+2. 在 **Configure Tools** 中勾选完整的 `DbgX.Mcp.Proxy` 工具组，至少包括 `list_sessions`、`connect_session`、`show_output` 和 `get_output_history`。蓝色高亮不等于已勾选。
+3. 从 Chat `/` 菜单或 **Chat: Run Prompt...** 运行 [WinDbg MCP Log Writer Demo](../.github/prompts/windbg-mcp-logwriter-demo.prompt.md)。
+4. Prompt 必须重新验证当前 session，不能复用上一次 Chat 的 PID、thread ID 或 extension 状态。
+5. Prompt 通过 MCP 按固定顺序分别执行：MEX `.load` → WinDbgCs `.load` → `.chain` → `!us logwriter` → 本次返回的 thread selection → `k` → `!mex.t -raw`。
+6. 对照 Prompt 输出和手工基线，确认 target session、两个 extension path、Log Writer thread，以及两种 stack view 的证据一致。
+
+“得到一样的结果”指相同的命令顺序、runtime gate、证据类型和输出结构，不是硬编码相同的动态数值。对于已验证的 `SQLDump0016.mdmp`，预期比较点是 MEX `3.1.0.243`、WinDbgCs `3.2.7`，以及一个包含 `SQLServerLogMgr::LogWriter` 的匹配 thread；每次演示仍必须由当前 runtime 重新证明。如果结果不同，应保留并解释差异，不得强行输出历史值。
+
 ## 5. dscript 版本管理
 
 不同 SQL Server 版本的 dscript 必须分开存放：
@@ -368,5 +393,7 @@ E96A0DCC04921A45CFC48393F18FC171868A80330B9CC106E0BAFA71F59EC02F
 - [ ] MEX 版本 `3.1.0.243` 已成功加载。
 - [ ] WinDbgCs 版本 `3.2.7` 已成功加载。
 - [ ] `.chain` 同时显示 MEX 和 WinDbgCs。
+- [ ] 已手工执行 `!us logwriter`、thread selection、`k` 和 `!mex.t -raw`。
+- [ ] 已运行 **WinDbg MCP Log Writer Demo**，并与手工 baseline 逐项核对。
 - [ ] 使用与 dump 中 SQL Server build 匹配的 dscript。
 - [ ] Dump、internal binary、INI 和 dscript 未提交到公开 GitHub。
