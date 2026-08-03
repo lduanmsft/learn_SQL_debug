@@ -85,8 +85,9 @@ WinDbg installer 的 Microsoft 内部来源为：
 
 1. 连接 Microsoft corporate VPN，并确认当前账户具有内部共享目录权限。
 2. 在 VS Code Chat 的 Agent picker 中选择 **SQL Server WinDbg Instructor**。
-3. 输入：`验证 Workshop 环境并按顺序指导我完成 Setup`。
-4. 按 Chat 中显示的 checkpoint 逐步完成检查。需要安装软件、staging assets 或修改持久配置时，请先确认再继续。
+3. 输入：`从头开始教学模式，一次只讲一个 checkpoint，等我手工执行并返回输出后再继续`。
+4. 此时进入**手工教学模式**：Chat 只说明当前步骤和命令，不会替你自动执行。你完成当前命令并粘贴输出后，Chat 才解释证据并给出下一步。
+5. 只有在你明确运行 **WinDbg MCP Log Writer Demo** 时，才进入自动 Prompt + MCP 演示。
 
 环境检查会在仓库根目录运行以下 source-assets 脚本：
 

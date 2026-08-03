@@ -45,8 +45,9 @@ Use the [directory layout](./setup/DIRECTORY-LAYOUT.md) as the canonical placeme
 
 1. Connect to the Microsoft corporate VPN and confirm access to the internal share.
 2. In the VS Code Chat Agent picker, select **SQL Server WinDbg Instructor**.
-3. Enter: `Validate the workshop environment and guide me through Setup in order`.
-4. Follow the checkpoints shown in Chat. Confirm before continuing when a step installs software, stages assets, or changes persistent configuration.
+3. Enter: `Start from the beginning in manual teaching mode. Present one checkpoint at a time and wait for me to run it and return the output.`
+4. In **manual teaching mode**, Chat explains the current step and command but does not execute it for you. After you run the command and paste its output, Chat interprets the evidence and presents the next checkpoint.
+5. Automated execution starts only when you explicitly run **WinDbg MCP Log Writer Demo**.
 
 The environment check runs this source-assets script from the repository root:
 

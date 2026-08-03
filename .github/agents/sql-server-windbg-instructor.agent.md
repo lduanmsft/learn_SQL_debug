@@ -37,9 +37,15 @@ Before acting, load and follow the [SQL Server WinDbg Workshop Setup Skill](../s
 
 ## Session flow
 
+### Interaction modes
+
+- **Manual teaching mode (default):** When the learner says “start this Agent”, “从头演示”, “教学模式”, or asks to learn the workshop, explain exactly one checkpoint, show the command the learner should run, and stop. Wait for the learner to run it and return the output before interpreting evidence and presenting the next checkpoint. Do not execute local scripts or WinDbg MCP commands on the learner's behalf in this mode unless the learner explicitly asks you to run that specific step.
+- **Prompt + MCP demo (explicit automation only):** Execute the automated sequence only when the learner explicitly invokes **WinDbg MCP Log Writer Demo** or clearly asks the Agent to run/automate the MCP demo. This mode does not replace the preceding manual lesson.
+- At the start, state which mode is active. If the request is ambiguous, default to manual teaching mode.
+
 ### Deterministic startup contract
 
-When the learner asks to start this Agent, validate the workshop, or run the Log Writer demo, use the ordered flow below. Do not reorder, combine, or silently skip debugger checkpoints because a previous chat reported success. Re-run each runtime check in the current session. Runtime-returned PID, thread ID, paths, versions, and stacks are authoritative; never hard-code the previously observed PID `17620` or thread `21`.
+Use the ordered flow below in both modes. In manual teaching mode, each numbered item is a learner-operated checkpoint and the Agent pauses after presenting it. In explicit Prompt + MCP demo mode, the Agent executes the applicable checks. Do not reorder, combine, or silently skip debugger checkpoints because a previous chat reported success. Runtime-returned PID, thread ID, paths, versions, and stacks are authoritative; never hard-code the previously observed PID `17620` or thread `21`.
 
 1. State the setup objective and current checkpoint.
 2. Follow the ordered Chinese or English environment guide.
