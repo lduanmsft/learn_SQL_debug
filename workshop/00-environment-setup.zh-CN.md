@@ -77,9 +77,11 @@ WinDbg installer 的 Microsoft 内部来源为：
 
 公开 GitHub 只保存安装脚本、验证逻辑、目录说明和不包含敏感内容的 manifest。
 
-## 4. 按顺序安装
+# 阶段一：准备 Workshop 环境
 
-### Step 1：连接 VPN 并检查源文件
+按以下顺序准备本地 assets、安装 debugger components，并验证 symbols/source 配置。阶段一完成只代表文件和配置已就绪，不代表 extension 已在某个 WinDbg session 中 runtime-loaded。
+
+## Step 1：连接 VPN 并检查源文件
 
 在仓库根目录运行：
 
@@ -97,7 +99,7 @@ WinDbg installer 的 Microsoft 内部来源为：
 
 任何必需文件缺失时，不要继续下一步。
 
-### Step 2：准备并计算 Workshop 文件哈希
+## Step 2：准备并计算 Workshop 文件哈希
 
 运行：
 
@@ -116,7 +118,7 @@ WinDbg installer 的 Microsoft 内部来源为：
 7. 复制 manifest 中配置的版本化 dscript 目录。
 8. 生成 `C:\tools\SqlDebugWorkshop\inventory.json`。
 
-### Step 3：安装 WinDbg Slow Ring
+## Step 3：安装 WinDbg Slow Ring
 
 打开：
 
@@ -138,7 +140,7 @@ Get-AppxPackage -Name Microsoft.WinDbg.Slow |
     Select-Object Name, Version, InstallLocation
 ```
 
-### Step 4：安装 WinDbgCs
+## Step 4：安装 WinDbgCs
 
 建议使用封装脚本：
 
@@ -171,7 +173,7 @@ C:\Program Files\PackageManagement\NuGet\Packages\WinDbgCs.3.2.7\WinDbgCsExt.dll
 
 如果原 PowerShell 一直没有返回提示符，但 `Get-Package` 已显示 Installed，可以按 `Ctrl+C` 终止仍在等待的调用；不要立即重复安装。
 
-### Step 5：配置 Symbol 和 Source Server
+## Step 5：配置 Symbol 和 Source Server
 
 运行：
 
@@ -205,7 +207,7 @@ C:\tools\SqlDebugWorkshop\source-server\srcsrv.default.ini
 
 不要在未经批准时修改 Machine scope，以免影响机器上的其他用户。
 
-### Step 6：验证完整环境
+## Step 6：验证完整环境
 
 运行：
 
@@ -224,7 +226,20 @@ C:\tools\SqlDebugWorkshop\source-server\srcsrv.default.ini
 - 用户级 `SRCSRV_INI_FILE`。
 - Asset inventory。
 
-### Step 7：打开 Dump
+# 阶段二：打开 Dump 并连接 WinDbg MCP
+
+阶段一只证明本地文件、package 和环境变量已经准备好；阶段二才证明目标 dump 已在 WinDbg 中打开、MCP 已连接到准确 session，并且 extension 已在该 runtime 中加载。每个 debugger command 必须单独执行，不能把相邻命令合并为一次 MCP execution。
+
+每个 checkpoint 的教学输出统一使用：
+
+- `Observation`：本次实际观察到什么。
+- `Evidence`：支持观察结果的 runtime 输出。
+- `Interpretation`：该证据能够说明什么。
+- `Confidence`：对当前结论的置信度。
+- `Does not prove`：该证据不能证明什么。
+- `Next checkpoint`：下一条要执行的检查。
+
+## Step 7：打开目标 Dump 并连接准确 Session
 
 在 WinDbg 中打开：
 
@@ -243,6 +258,31 @@ C:\Users\lduan\debug_workshop\log_writer\wait_logbuffer\SQLDump0016.mdmp
 
 在 WinDbg MCP 成功连接并确认目标 dump 之前，只能把 MEX/WinDbgCs 记为“文件已存在”；不能报告扩展已经加载。
 
+如果没有匹配 session，停止并要求学员在 WinDbg 中手工打开 dump；不得连接无关 session。PID 和 MCP pipe 每次启动都可能变化，不能使用历史 PID 选择 session。
+
+## Step 8：检查 Dump Capture Structure
+
+连接准确 session 后，单独执行：
+
+```text
+.dumpdebug
+```
+
+教学时说明：
+
+- `MINIDUMP_HEADER`：signature、format version、stream count、directory、timestamp 和 capture flags。
+- `MINIDUMP_TYPE`/flags：dump 创建时请求的 capture options；不能保证每个目标地址都可读。
+- `ThreadListStream`：记录的 thread ID、context 和 stack descriptor；存在 thread record 不等于整个 stack 都能 unwind。
+- `ThreadInfoListStream`：额外 thread metadata，不是 call stack。
+- `MemoryListStream`/`Memory64ListStream`：实际保存字节的 virtual-memory ranges。
+- `MiniDumpWithFullMemoryInfo` 描述 memory map metadata，不等同于 `MiniDumpWithFullMemory`。
+- `ModuleListStream` 与 `UnloadedModuleListStream`：module metadata；module 存在不等于 symbols 已成功加载。
+- `ExceptionStream`：存在时描述 dump-triggering thread 的 exception/context，不代表所有 threads。
+
+这里只解释 dump capture structure，不分析 Log Writer 状态，也不推断 Lab 1 root cause。
+
+## Step 9：检查 Symbols
+
 连接完成后，使用 `.sympath` 作为一次独立的 WinDbg MCP 命令检查当前 session 的 symbol path。已经验证过的 WinDbg session path 为：
 
 ```text
@@ -259,12 +299,37 @@ cache*C:\symbol;srv*https://symweb.azurefd.net
 
 ```text
 .sympath srv*C:\symbol*https://symweb.azurefd.net;cache*C:\symbol;srv*https://symweb.azurefd.net
+```
+
+需要强制 reload 时，再单独执行：
+
+```text
 .reload /f
 ```
 
 不要把多个 debugger 命令拼接到 `.sympath` 参数后面，否则后续文本可能被错误地当作 symbol path。
 
-### Step 8：加载 MEX
+## Step 10：打开私有 WinDbg Command Log（教学时建议）
+
+使用本机私有目录，不要把 dump command output 写入公开仓库。分别执行：
+
+```text
+.logopen /t C:\temp\windbg-workshop.txt
+```
+
+```text
+.logfile
+```
+
+课程结束时单独执行：
+
+```text
+.logclose
+```
+
+`.logopen` 是 WinDbg native command，不要与 WinDbgCs 中名称相似的 logging API 混淆。如果目标文件已存在，不要静默覆盖证据。
+
+## Step 11：加载 MEX
 
 在 WinDbg command window 中运行：
 
@@ -278,7 +343,9 @@ cache*C:\symbol;srv*https://symweb.azurefd.net
 Mex 3.1.0.243 Loaded!
 ```
 
-### Step 9：加载 WinDbgCs
+`.load` 没有报错仍不足以单独证明 extension 已加载；后续必须用 `.chain` 验证准确路径。
+
+## Step 12：加载 WinDbgCs
 
 运行：
 
@@ -295,7 +362,7 @@ NuGet Version: 3.2.7
 
 不要只复制 `WinDbgCsExt.dll`。它依赖同一 package 目录下的其他 DLL，因此应从 PackageManagement 安装目录加载。
 
-### Step 10：确认扩展链
+## Step 13：确认 Extension Chain
 
 运行：
 
@@ -312,19 +379,51 @@ C:\Program Files\PackageManagement\NuGet\Packages\WinDbgCs.3.2.7\WinDbgCsExt.dll
 
 在 `.chain` 验证通过之前，不要依赖 MEX 或 WinDbgCs 的命令输出。
 
-### Step 11：手工建立 Log Writer stack 基线
+## Step 14：发现 MEX 命令并建立 Log Writer Stack 基线
 
 完成 `.chain` 验证后，学员先逐条手工执行以下步骤。每个命令必须单独运行：
 
-1. 执行 `!mex.help`，确认当前 MEX 版本实际提供的语法。
+1. 执行 `!mex.help`，确认当前 MEX 版本实际提供的语法；不要根据其他版本猜测 command name。
 2. 执行 `!us logwriter`，不要使用输出量很大的无过滤 `!mex.us`。
-3. 记录本次输出返回的 debugger thread ID 和 `SQLServerLogMgr::LogWriter` frame。
-4. 仅使用本次输出返回的 thread link/ID 切换 thread；不得把示例 thread ID 固化到课程。
-5. 执行 native `k`，保存 WinDbg unwind call chain。
-6. 执行 `!mex.t -raw`，保存 MEX 从 stack pointer 到 stack base 的 raw scan。
-7. 对比两者：`k` 是经过 unwind 的 call chain；`!mex.t -raw` 中可符号化的地址不一定都是有效 frame。
+3. 记录本次输出返回的 debugger thread ID、selection link/command 和 `SQLServerLogMgr::LogWriter` frame。匹配只表示 candidate thread，不证明 root cause。
+4. 记录切换前的 current debugger thread/context。
+5. 仅使用本次输出返回的 thread link/ID 切换 thread；不得把示例 thread ID 固化到课程。如果目标 thread 已经是 current thread，则记录该事实，不做无意义切换。
+6. 执行 native `k`，保存 WinDbg unwind call chain。
+7. 确认 current debugger context 仍是同一个 runtime-returned thread。
+8. 执行 `!mex.t -raw`，保存 MEX 从 stack pointer 到 stack base 的 raw scan。
+9. 对比两者：`k` 使用当前 thread/register context、unwind metadata 和 symbols 重建 call chain；`!mex.t -raw` 扫描 stack pointer 到 stack base 之间可符号化的潜在 code pointers，其中不一定都是经过 unwind 验证的 frame。
 
-### Step 12：Prompt + WinDbg MCP 自动复现
+`!mex.t -raw` 输出更长，不表示 MEX 添加了 dump memory、修复了 dump、或证明 native symbols 错误。Setup 阶段只教学 presentation difference；stack 诊断转交 `agent_lab1`。
+
+对于已验证的 `SQLDump0016.mdmp`，历史比较基线是一个匹配 thread，且 native stack 包含 `sqlmin!SQLServerLogMgr::LogWriter`。历史 debugger thread ID `21` 只能用于课后比较，不能用于下一次 thread selection。
+
+## Step 15：确认 SQL Server Build 并发现 WinDbgCs Scripts
+
+先单独执行：
+
+```text
+lmv m sqlservr
+```
+
+记录当前 dump 中 `sqlservr.exe` 的精确 build 和 file version，再选择版本匹配的 dscript。已验证 dump 的历史 baseline 是 SQL Server `13.0.5366.0`、file version `2015.131.5366.0`；当前输出始终具有更高优先级。
+
+然后单独执行 bare command：
+
+```text
+!execute
+```
+
+保存当前 WinDbgCs runtime 返回的 scripts、help 和 DML links。只能使用本次输出实际公布的名称与语法，不要猜 script name，也不要把受保护的 `.js` 文件当普通 JavaScript 直接执行。
+
+只有当 bare `!execute` 明确公布下列初始化 action，并且所需 scripts 尚未加载时，才单独执行：
+
+```text
+!execute ExternalScripts.Install ;
+```
+
+如果 scripts 已加载，则跳过安装。Setup Agent 可以解释 catalog/help；诊断 dscript 的执行和结果解释属于 `agent_lab1`。
+
+## Step 16：Prompt + WinDbg MCP 自动复现
 
 手工基线讲解完成后，再演示 Prompt 自动化，不能用 Prompt 代替学员理解前面的命令：
 
@@ -336,6 +435,29 @@ C:\Program Files\PackageManagement\NuGet\Packages\WinDbgCs.3.2.7\WinDbgCsExt.dll
 6. 对照 Prompt 输出和手工基线，确认 target session、两个 extension path、Log Writer thread，以及两种 stack view 的证据一致。
 
 “得到一样的结果”指相同的命令顺序、runtime gate、证据类型和输出结构，不是硬编码相同的动态数值。对于已验证的 `SQLDump0016.mdmp`，预期比较点是 MEX `3.1.0.243`、WinDbgCs `3.2.7`，以及一个包含 `SQLServerLogMgr::LogWriter` 的匹配 thread；每次演示仍必须由当前 runtime 重新证明。如果结果不同，应保留并解释差异，不得强行输出历史值。
+
+### 手工步骤与 Prompt + MCP 证据对照
+
+| 手工 checkpoint | Prompt + MCP checkpoint | 必需证据 |
+|---|---|---|
+| 识别 WinDbg window | 列出、连接并验证 session | 当前 dump path/title 和 active PID |
+| 加载 MEX | 第一条独立 `.load` | 无 load error；随后由 `.chain` 证明 |
+| 加载 WinDbgCs | 第二条独立 `.load` | 无 load error；随后由 `.chain` 证明 |
+| 验证 extensions | 独立 `.chain` | 两个准确 DLL path 和 version |
+| 查找 Log Writer | `!us logwriter` | 本次返回的 thread 和 `SQLServerLogMgr::LogWriter` frame |
+| 选择 thread | 本次返回的 link/ID | current context 是匹配 thread |
+| Native stack | 独立 `k` | WinDbg-unwound call chain |
+| Raw stack scan | 独立 `!mex.t -raw` | 同一 thread 的 stack-pointer-to-base output |
+
+## Step 17：结束 Runtime Gate 并交接
+
+1. 再次单独执行 `.chain`，确认两个准确 extension paths 仍存在。
+2. 如果打开了 command log，执行 `.logfile` 确认状态，然后执行 `.logclose`。
+3. 汇总本次 session 已证明的事实、仍未知的内容，以及与 validated baseline 的差异。
+4. 只有当 dump/session、symbols、两个 extensions、filtered Log Writer thread 和两种 stack view 均有当前 runtime evidence 时，才报告 Setup runtime gate 通过。
+5. 后续 stack interpretation、source correlation 和 root-cause investigation 切换到 `agent_lab1`。
+
+# 参考附录
 
 ## 5. dscript 版本管理
 
