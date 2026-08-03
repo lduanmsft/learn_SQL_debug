@@ -16,23 +16,27 @@
         "npm_config_registry": "https://packagefeedproxy.microsoft.io/npm/"
       }
     },
+    "sqlclientdrivers": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@azure-devops/mcp@latest", "sqlclientdrivers"]
+    },
+    "microsoft": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@azure-devops/mcp@latest", "microsoft", "-d", "core", "search", "repositories"],
+      "env": {
+        "ado_mcp_project": "OS"
+      }
+    },
      "microsoft-learn": {
       "type": "http",
       "url": "https://learn.microsoft.com/api/mcp"
-    },
-    "enghub": {
-      "type": "stdio",
-      "command": "enghub-mcp",
-      "args": ["start"]
     },
     "azure-mcp": {
       "type": "stdio",
       "command": "azmcp",
       "args": ["server", "start", "--namespace", "kusto"]
-    },
-    "SqlOps": {
-      "type": "http",
-      "url": "https://sqlops-mcp.azurewebsites.net/"
     },
     "bluebird-mcp-sql": {
       "type": "http",
@@ -89,6 +93,11 @@
         "x-mcp-ec-mode": "mini+full"
       }
     },
+    "WinDbg": {
+      "type": "stdio",
+      "command": "C:\\Users\\lduan\\AppData\\Local\\Microsoft\\WindowsApps\\Microsoft.WinDbg.Slow_8wekyb3d8bbwe\\DbgX.Mcp.Proxy.exe",
+      "args": []
+    },
     "bluebird-mcp-2016": {
       "type": "http",
       "url": "https://mcp.bluebird-ai.net/",
@@ -99,10 +108,8 @@
         "x-mcp-ec-branch": "rel/box/sql2016/sql2016_sp3_gdr",
         "x-mcp-ec-mode": "mini+full"
       }
-    },
-    "icm-prod": {
-      "type": "http",
-      "url": "https://icm-mcp-prod.azure-api.net/v1/"
     }
   }
 }
+
+
