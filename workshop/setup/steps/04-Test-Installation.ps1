@@ -35,6 +35,44 @@ foreach ($entry in $paths) {
     })
 }
 
+$commandCatalogPath = Join-Path $PSScriptRoot '06-WinDbg-Load-Commands.txt'
+$requiredDebuggerCommands = @(
+    '.sympath',
+    '.sympath srv*C:\symbol*https://symweb.azurefd.net;cache*C:\symbol;srv*https://symweb.azurefd.net',
+    '.reload /f',
+    '.logopen /t C:\temp\windbg-workshop.txt',
+    '.logfile',
+    '.logclose',
+    '.load C:\tools\SqlDebugWorkshop\extensions\mex.dll',
+    '.load C:\Program Files\PackageManagement\NuGet\Packages\WinDbgCs.3.2.7\WinDbgCsExt.dll',
+    '.chain',
+    '!mex.help',
+    '!us logwriter',
+    'k',
+    '!mex.t -raw',
+    'lmv m sqlservr',
+    '!execute',
+    '!execute ExternalScripts.Install ;'
+)
+
+$catalogLines = if (Test-Path -LiteralPath $commandCatalogPath -PathType Leaf) {
+    @(Get-Content -LiteralPath $commandCatalogPath)
+}
+else {
+    @()
+}
+$missingDebuggerCommands = @($requiredDebuggerCommands | Where-Object { $_ -cnotin $catalogLines })
+$checks.Add([pscustomobject]@{
+    Component = 'Canonical WinDbg command catalog'
+    Passed = $missingDebuggerCommands.Count -eq 0
+    Detail = if ($missingDebuggerCommands.Count -eq 0) {
+        "$($requiredDebuggerCommands.Count) required commands verified in $commandCatalogPath"
+    }
+    else {
+        "Missing exact commands: $($missingDebuggerCommands -join ' | ')"
+    }
+})
+
 $sourceServerIni = [Environment]::GetEnvironmentVariable('SRCSRV_INI_FILE', 'User')
 $checks.Add([pscustomobject]@{
     Component = 'Source server INI'

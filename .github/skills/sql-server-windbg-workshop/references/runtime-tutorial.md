@@ -2,6 +2,8 @@
 
 Use this tutorial after local prerequisites pass. Teach one checkpoint at a time and run one debugger command per WinDbg MCP execution.
 
+This document explains the commands but is not their executable source. Before execution, read [06-WinDbg-Load-Commands.txt](../../../workshop/setup/steps/06-WinDbg-Load-Commands.txt) and copy the applicable static command verbatim. Do not generate command text from this tutorial. If a static command is missing from the catalog, add it there before execution. For thread selection, use only the exact DML command returned by the current `!us logwriter` output.
+
 ## 1. Open the target dump in WinDbg
 
 1. Start the validated WinDbg Slow Ring application.
@@ -21,27 +23,7 @@ Opening a file in the editor or proving that it exists on disk does not prove Wi
 
 MCP connection and dump loading are separate facts: MCP may be available while no target dump is open.
 
-## 3. Inspect dump capture structure
-
-After connecting to the exact dump session, execute one standalone command:
-
-```text
-.dumpdebug
-```
-
-Explain the output as dump metadata, not as a diagnosis:
-
-- `MINIDUMP_HEADER`: signature, format version, stream count, directory location, timestamp, and capture flags.
-- `MINIDUMP_TYPE`/flags: options requested when the dump was created. A flag does not guarantee that every requested address is readable.
-- `ThreadListStream`: recorded thread IDs, contexts, and stack descriptors. A recorded thread does not by itself prove that its entire stack can be unwound.
-- `ThreadInfoListStream`: additional thread metadata; it is not a call stack.
-- `MemoryListStream` or `Memory64ListStream`: virtual-memory ranges whose bytes were saved. `MiniDumpWithFullMemoryInfo` describes the memory map; it is not equivalent to `MiniDumpWithFullMemory`.
-- `ModuleListStream` and `UnloadedModuleListStream`: loaded and unloaded module metadata. Module presence is separate from successful symbol loading.
-- `ExceptionStream`: exception record and context for the dump-triggering thread when present; it does not represent every thread.
-
-Use the actual output to state what is present and what remains unknown. Do not conclude that a Log Writer thread is absent merely because a filter returns no result, and do not infer a Lab 1 root cause from dump flags or stream names.
-
-## 4. Configure and verify symbols
+## 3. Configure and verify symbols
 
 For persistent user-level setup, use the approved configuration script only when requested:
 
@@ -66,7 +48,7 @@ If the current session must be corrected, execute this as its own command:
 
 Then execute `.reload /f` separately. This can be expensive; explain why it is needed before running it. If symbol loading is unexpected, inspect WinDbg logs before changing configuration again.
 
-## 5. Open and close a WinDbg command log
+## 4. Open and close a WinDbg command log
 
 The native WinDbg command is `.logopen`, not `log.open`.
 
@@ -94,7 +76,7 @@ Close it as a separate command:
 
 Do not confuse native `.logopen` with a C# or dscript logging API such as `logopen(String)` found inside WinDbgCs.
 
-## 6. Load and verify MEX
+## 5. Load and verify MEX
 
 Execute exactly one command:
 
@@ -155,7 +137,7 @@ k
 
 `!us logwriter` is preferred over unfiltered `!mex.us` for this workshop checkpoint because it keeps output bounded and teaches targeted thread discovery. Setup may demonstrate command mechanics and compare `k` with `!mex.t -raw`; stack diagnosis belongs to `agent_lab1`.
 
-## 7. Load and verify WinDbgCs
+## 6. Load and verify WinDbgCs
 
 Execute exactly one command:
 
@@ -172,7 +154,7 @@ NuGet Version: 3.2.7
 
 Load from the package directory because adjacent dependencies are required. Then execute `.chain` separately and verify the exact WinDbgCs path.
 
-## 8. Discover `!execute` scripts and initialize dscript only when needed
+## 7. Discover `!execute` scripts and initialize dscript only when needed
 
 After `.chain` proves WinDbgCs is loaded, first execute the bare command as one standalone debugger execution:
 
@@ -204,7 +186,7 @@ Do not run that initialization command by default. If bare `!execute` already re
 
 This Setup Agent may explain the catalog and follow a harmless runtime-provided Help link. Running diagnostic dscript and interpreting SQL state belongs to `agent_lab1` after the setup gate passes.
 
-## 9. Final runtime proof
+## 8. Final runtime proof
 
 Execute `.chain` alone. Setup passes only when it shows both exact paths:
 
@@ -215,7 +197,7 @@ C:\Program Files\PackageManagement\NuGet\Packages\WinDbgCs.3.2.7\WinDbgCsExt.dll
 
 Record what is proven, what remains unknown, whether command logging is active/closed, and whether the learner can switch to `agent_lab1`.
 
-## 10. Prompt + WinDbg MCP demo
+## 9. Prompt + WinDbg MCP demo
 
 Run this only after the learner understands the preceding manual commands. The objective is to demonstrate that one reusable Prompt can instruct the Agent to call WinDbg MCP and collect the same runtime evidence without bypassing any gate.
 

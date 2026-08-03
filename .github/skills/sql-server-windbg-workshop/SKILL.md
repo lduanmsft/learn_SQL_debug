@@ -17,7 +17,7 @@ This Skill supports:
 - WinDbg workshop environment readiness.
 - Symbol and source-server configuration checks.
 - MEX and WinDbgCs file/package validation.
-- Opening the target dump, connecting WinDbg MCP to the exact session, and inspecting dump capture structure with `.dumpdebug`.
+- Opening the target dump and connecting WinDbg MCP to the exact session.
 - Loading MEX and WinDbgCs separately and verifying both with `.chain`.
 - Native WinDbg command logging with `.logopen`, `.logfile`, and `.logclose`.
 - Basic MEX help/discovery, filtered `!us logwriter`, and a bounded comparison of native WinDbg `k` with MEX `!mex.t -raw`.
@@ -34,18 +34,25 @@ Follow [environment readiness](./references/environment-readiness.md) and the [r
 - Chinese: [workshop/00-environment-setup.zh-CN.md](../../../workshop/00-environment-setup.zh-CN.md)
 - English: [workshop/00-environment-setup.md](../../../workshop/00-environment-setup.md)
 
+The canonical executable sources are:
+
+- Local setup: the checked-in PowerShell scripts under [workshop/setup/steps](../../../workshop/setup/steps/).
+- WinDbg runtime: [06-WinDbg-Load-Commands.txt](../../../workshop/setup/steps/06-WinDbg-Load-Commands.txt).
+
+Do not derive executable commands from prose. Copy each static debugger command verbatim from the catalog. The only dynamic debugger action is the exact thread-selection DML command returned by the current `!us logwriter` output.
+
 ## Mandatory rules
 
 1. Never fabricate commands, output, package state, paths, or debugger state.
-2. Before the target dump is opened, automatically run the prerequisite workflow: source-asset validation, idempotent staging when needed, package/install verification, symbol/source configuration when needed, and final installation verification. Skip steps already proven complete.
-3. Pause prerequisite automation when learner interaction is required: a loaded DLL must be released, App Installer UI is needed, an approved asset is missing, or a persistent configuration change requires confirmation.
-4. Manual teaching mode begins at “Open the dump and connect WinDbg MCP”. From that point, present one checkpoint and wait for the learner to execute it and return output. Do not run WinDbg MCP commands merely because the learner said “start”, “demonstrate from the beginning”, or “teaching mode”.
-5. Automated debugger execution is allowed only when the learner explicitly invokes the Prompt + MCP demo or asks the Agent to run a specific debugger checkpoint. State the active phase before beginning.
-6. A DLL existing on disk does not prove it is loaded in WinDbg.
-7. Restart WinDbg after environment-variable changes.
-8. Before extension checks, confirm the target dump is open, list WinDbg MCP sessions, connect to the exact session, and verify it from the title/history.
-9. Use one debugger command per WinDbg MCP execution.
-10. Run `.dumpdebug` separately after connecting to the exact dump. Explain `MINIDUMP_HEADER`, flags, stream directory, thread streams, and memory streams. Flags describe requested capture options; stream presence alone does not prove every address is readable. Do not infer a Lab 1 cause from dump structure.
+2. Never execute an AI-generated or reconstructed shell/debugger command. Run local actions through checked-in scripts and debugger actions through exact entries in `06-WinDbg-Load-Commands.txt`. If a required static command is missing, stop and add it to the checked-in executable source before running it.
+3. Before the target dump is opened, automatically run the prerequisite workflow: source-asset validation, idempotent staging when needed, package/install verification, symbol/source configuration when needed, and final installation verification. Skip steps already proven complete.
+4. Pause prerequisite automation when learner interaction is required: a loaded DLL must be released, App Installer UI is needed, an approved asset is missing, or a persistent configuration change requires confirmation.
+5. Manual teaching mode begins at “Open the dump and connect WinDbg MCP”. From that point, present one checkpoint and wait for the learner to execute it and return output. Do not run WinDbg MCP commands merely because the learner said “start”, “demonstrate from the beginning”, or “teaching mode”.
+6. Automated debugger execution is allowed only when the learner explicitly invokes the Prompt + MCP demo or asks the Agent to run a specific debugger checkpoint. State the active phase before beginning.
+7. A DLL existing on disk does not prove it is loaded in WinDbg.
+8. Restart WinDbg after environment-variable changes.
+9. Before extension checks, confirm the target dump is open, list WinDbg MCP sessions, connect to the exact session, and verify it from the title/history.
+10. Use one debugger command per WinDbg MCP execution.
 11. Run `.sympath` alone; never append another command because semicolons belong to symbol-path syntax.
 12. Execute the MEX and WinDbgCs `.load` commands separately, then execute `.chain` separately.
 13. Do not expose or upload internal binaries, symbols, dscript, source-server configuration, dumps, or traces.
@@ -80,7 +87,6 @@ Setup is complete only when:
 
 - Required files, packages, environment values, and target dump are verified.
 - WinDbg MCP is connected to the session containing that target dump.
-- `.dumpdebug` has been inspected in that session and its capture flags/streams explained without overclaiming.
 - `.sympath` has been checked in that session.
 - MEX and WinDbgCs were loaded using two separate `.load` executions.
 - A separate `.chain` execution shows both exact extension paths without load errors.

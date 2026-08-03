@@ -126,6 +126,8 @@ Do not set the machine scope unless all users on the machine should share the sa
 
 Phase 1 proves that local files, packages, and environment values are ready. Phase 2 proves that the target dump is open in WinDbg, MCP is connected to the exact session, and the extensions are runtime-loaded. Execute one debugger command per WinDbg MCP execution; never combine adjacent checkpoints.
 
+All local preparation must run through the checked-in PowerShell scripts under `workshop\setup\steps`. Every static WinDbg command must be copied verbatim from `workshop\setup\steps\06-WinDbg-Load-Commands.txt`; the AI must not compose commands from prose. If a static command is missing, add and review it in that catalog before execution. The sole dynamic exception is thread selection, which must use the exact DML selection command returned by the current `!us logwriter` output.
+
 **Manual teaching mode starts here.** The Agent presents one checkpoint and pauses. Complete the action and return the result before requesting the next step. The Agent does not execute WinDbg MCP commands unless you explicitly request that checkpoint or run the Prompt demo.
 
 When reading each checkpoint, focus on:
@@ -148,28 +150,7 @@ Open the Lab 1 dump in WinDbg and wait until initial dump and symbol output sett
 
 Until the dump session is connected and `.chain` later verifies the extensions, report only that the DLL files are present—not that MEX or WinDbgCs is runtime-loaded. Process IDs and MCP pipe names are dynamic; never select a future session from a historical PID.
 
-## Step 8 — Inspect the dump capture structure
-
-After connecting to the exact session, execute separately:
-
-```text
-.dumpdebug
-```
-
-Teach the output as capture metadata rather than diagnosis:
-
-- `MINIDUMP_HEADER`: signature, format version, stream count, directory, timestamp, and flags.
-- `MINIDUMP_TYPE`/flags: capture options requested by the dump writer; they do not guarantee that every target address is readable.
-- `ThreadListStream`: recorded thread IDs, contexts, and stack descriptors. A thread record does not guarantee complete unwindable stack memory.
-- `ThreadInfoListStream`: additional thread metadata, not a call stack.
-- `MemoryListStream`/`Memory64ListStream`: virtual-memory ranges whose bytes were captured.
-- `MiniDumpWithFullMemoryInfo` describes memory-map metadata; it is not equivalent to `MiniDumpWithFullMemory`.
-- `ModuleListStream` and `UnloadedModuleListStream`: module metadata; module presence is separate from successful symbol loading.
-- `ExceptionStream`: the dump-triggering thread exception/context when present; it does not represent every thread.
-
-Do not infer Log Writer state or a Lab 1 root cause from dump flags or stream names.
-
-## Step 9 — Verify symbols
+## Step 8 — Verify symbols
 
 Run `.sympath` as one standalone WinDbg MCP command.
 
@@ -191,7 +172,7 @@ When a forced reload is justified, execute it as another command:
 
 Never append another command after `.sympath`; semicolons are valid symbol-path syntax.
 
-## Step 10 — Open a private WinDbg command log (recommended for teaching)
+## Step 9 — Open a private WinDbg command log (recommended for teaching)
 
 Use a local private directory, not the public repository. Execute each command separately:
 
@@ -211,7 +192,7 @@ At the end of the lesson:
 
 `.logopen` is a native WinDbg command, not a similarly named WinDbgCs API. Do not silently overwrite an existing evidence file.
 
-## Step 11 — Load MEX
+## Step 10 — Load MEX
 
 Execute separately:
 
@@ -221,7 +202,7 @@ Execute separately:
 
 The validated version reports MEX `3.1.0.243`. A silent or error-free `.load` is not sufficient proof; `.chain` must later show the exact path.
 
-## Step 12 — Load WinDbgCs
+## Step 11 — Load WinDbgCs
 
 Execute separately:
 
@@ -231,7 +212,7 @@ Execute separately:
 
 Load from the package directory because adjacent dependencies are required. The validated package reports WinDbgCs `3.2.7`.
 
-## Step 13 — Verify the extension chain
+## Step 12 — Verify the extension chain
 
 Execute separately:
 
@@ -248,7 +229,7 @@ C:\Program Files\PackageManagement\NuGet\Packages\WinDbgCs.3.2.7\WinDbgCsExt.dll
 
 Do not rely on MEX or WinDbgCs command output until this gate passes.
 
-## Step 14 — Discover MEX commands and establish the manual Log Writer stack baseline
+## Step 13 — Discover MEX commands and establish the manual Log Writer stack baseline
 
 After `.chain` succeeds, teach the learner to run each command separately:
 
@@ -266,7 +247,7 @@ A longer `!mex.t -raw` result does not mean MEX added dump memory, repaired the 
 
 For the validated `SQLDump0016.mdmp`, the historical baseline had one matching thread and a native stack containing `sqlmin!SQLServerLogMgr::LogWriter`. Historical debugger thread `21` is comparison evidence only and must never be used for a future selection.
 
-## Step 15 — Verify the SQL Server build and discover WinDbgCs scripts
+## Step 14 — Verify the SQL Server build and discover WinDbgCs scripts
 
 First execute separately:
 
@@ -292,7 +273,7 @@ Only when bare `!execute` advertises the following initialization action and req
 
 Skip installation when scripts are already loaded. This phase covers catalog/help discovery only. Switch to **agent_lab1** when diagnostic dscript execution or SQL Server state interpretation is required.
 
-## Step 16 — Reproduce the baseline with Prompt + WinDbg MCP
+## Step 15 — Reproduce the baseline with Prompt + WinDbg MCP
 
 After the manual sequence is understood:
 
@@ -320,7 +301,7 @@ After the manual sequence is understood:
 | Native stack | Standalone `k` | WinDbg-unwound call chain |
 | Raw stack scan | Standalone `!mex.t -raw` | Stack-pointer-to-base output for the same thread |
 
-## Step 17 — Complete environment validation and continue to Lab 1
+## Step 16 — Complete environment validation and continue to Lab 1
 
 1. Execute `.chain` separately again and verify that both exact extension paths remain present.
 2. If command logging was opened, run `.logfile` to verify state and then `.logclose`.

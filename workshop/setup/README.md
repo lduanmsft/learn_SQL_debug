@@ -10,7 +10,9 @@ Follow the numbered scripts in `steps` for the learner workflow:
 4. `03-Install-WinDbgCs.ps1`
 5. `04-Test-Installation.ps1`
 6. Run `05-Configure-SymbolsAndSource.ps1`, then restart WinDbg.
-7. Run `06-WinDbg-Load-Commands.txt` inside WinDbg.
+7. Use `06-WinDbg-Load-Commands.txt` as the canonical WinDbg command catalog. Run one catalog command at a time; do not execute the entire file as one command script.
+
+All local setup actions must use the checked-in PowerShell scripts above. All static WinDbg commands must be copied verbatim from `06-WinDbg-Load-Commands.txt`; do not have an AI compose commands from prose. The only dynamic debugger action is the exact thread-selection DML command returned by the current `!us logwriter` output. If a new static command is needed, add and review it in the catalog before execution.
 
 See `DIRECTORY-LAYOUT.md` for the required Git, `C:\tools`, PackageManagement, and dump directories.
 

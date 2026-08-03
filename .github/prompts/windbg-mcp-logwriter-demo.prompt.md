@@ -7,6 +7,8 @@ agent: 'SQL Server WinDbg Instructor'
 
 Use WinDbg MCP to conduct a Log Writer stack demonstration in the target SQL Server dump session, automatically reproducing the steps the learner just completed manually.
 
+Before executing debugger commands, read [the canonical WinDbg workshop command catalog](../../workshop/setup/steps/06-WinDbg-Load-Commands.txt). Copy every static command verbatim from that file; do not generate, reconstruct, abbreviate, or alter command text. The only dynamic action is thread selection, which must use the exact DML selection command returned by the current `!us logwriter` output. If a required static command is absent from the catalog, stop instead of inventing it.
+
 Even if the previous chat completed successfully, rerun the workflow and collect fresh evidence from the current session. Do not reuse a previous PID, thread ID, extension state, or stack output. Follow the exact order below; do not reorder or combine debugger commands.
 
 1. List the WinDbg sessions. Use the window title and output history to connect to and verify the target SQL Server dump session; do not select an unrelated session.

@@ -249,6 +249,8 @@ C:\tools\SqlDebugWorkshop\source-server\srcsrv.default.ini
 
 阶段一只证明本地文件、package 和环境变量已经准备好；阶段二才证明目标 dump 已在 WinDbg 中打开、MCP 已连接到准确 session，并且 extension 已在该 runtime 中加载。每个 debugger command 必须单独执行，不能把相邻命令合并为一次 MCP execution。
 
+所有本地准备操作必须运行 `workshop\setup\steps` 中已提交的 PowerShell scripts。所有静态 WinDbg commands 必须逐字取自 `workshop\setup\steps\06-WinDbg-Load-Commands.txt`，不能由 AI 根据说明临时生成。如果缺少静态命令，必须先将其加入并审核该 command catalog，再执行。唯一动态例外是 thread selection：必须逐字使用本次 `!us logwriter` 输出提供的 DML selection command。
+
 **教学模式从这里开始。** Agent 会先给出当前 checkpoint，然后暂停；请完成操作并返回结果，再获取下一步。Agent 不会自动执行 WinDbg MCP command，除非你明确要求执行该 checkpoint 或运行 Prompt demo。
 
 阅读每个 checkpoint 时，请关注：
@@ -281,28 +283,7 @@ C:\Users\lduan\debug_workshop\log_writer\wait_logbuffer\SQLDump0016.mdmp
 
 如果没有匹配 session，停止并要求学员在 WinDbg 中手工打开 dump；不得连接无关 session。PID 和 MCP pipe 每次启动都可能变化，不能使用历史 PID 选择 session。
 
-## Step 8：检查 Dump Capture Structure
-
-连接准确 session 后，单独执行：
-
-```text
-.dumpdebug
-```
-
-教学时说明：
-
-- `MINIDUMP_HEADER`：signature、format version、stream count、directory、timestamp 和 capture flags。
-- `MINIDUMP_TYPE`/flags：dump 创建时请求的 capture options；不能保证每个目标地址都可读。
-- `ThreadListStream`：记录的 thread ID、context 和 stack descriptor；存在 thread record 不等于整个 stack 都能 unwind。
-- `ThreadInfoListStream`：额外 thread metadata，不是 call stack。
-- `MemoryListStream`/`Memory64ListStream`：实际保存字节的 virtual-memory ranges。
-- `MiniDumpWithFullMemoryInfo` 描述 memory map metadata，不等同于 `MiniDumpWithFullMemory`。
-- `ModuleListStream` 与 `UnloadedModuleListStream`：module metadata；module 存在不等于 symbols 已成功加载。
-- `ExceptionStream`：存在时描述 dump-triggering thread 的 exception/context，不代表所有 threads。
-
-这里只解释 dump capture structure，不分析 Log Writer 状态，也不推断 Lab 1 root cause。
-
-## Step 9：检查 Symbols
+## Step 8：检查 Symbols
 
 连接完成后，使用 `.sympath` 作为一次独立的 WinDbg MCP 命令检查当前 session 的 symbol path。已经验证过的 WinDbg session path 为：
 
@@ -330,7 +311,7 @@ cache*C:\symbol;srv*https://symweb.azurefd.net
 
 不要把多个 debugger 命令拼接到 `.sympath` 参数后面，否则后续文本可能被错误地当作 symbol path。
 
-## Step 10：打开私有 WinDbg Command Log（教学时建议）
+## Step 9：打开私有 WinDbg Command Log（教学时建议）
 
 使用本机私有目录，不要把 dump command output 写入公开仓库。分别执行：
 
@@ -350,7 +331,7 @@ cache*C:\symbol;srv*https://symweb.azurefd.net
 
 `.logopen` 是 WinDbg native command，不要与 WinDbgCs 中名称相似的 logging API 混淆。如果目标文件已存在，不要静默覆盖证据。
 
-## Step 11：加载 MEX
+## Step 10：加载 MEX
 
 在 WinDbg command window 中运行：
 
@@ -366,7 +347,7 @@ Mex 3.1.0.243 Loaded!
 
 `.load` 没有报错仍不足以单独证明 extension 已加载；后续必须用 `.chain` 验证准确路径。
 
-## Step 12：加载 WinDbgCs
+## Step 11：加载 WinDbgCs
 
 运行：
 
@@ -383,7 +364,7 @@ NuGet Version: 3.2.7
 
 不要只复制 `WinDbgCsExt.dll`。它依赖同一 package 目录下的其他 DLL，因此应从 PackageManagement 安装目录加载。
 
-## Step 13：确认 Extension Chain
+## Step 12：确认 Extension Chain
 
 运行：
 
@@ -400,7 +381,7 @@ C:\Program Files\PackageManagement\NuGet\Packages\WinDbgCs.3.2.7\WinDbgCsExt.dll
 
 在 `.chain` 验证通过之前，不要依赖 MEX 或 WinDbgCs 的命令输出。
 
-## Step 14：发现 MEX 命令并建立 Log Writer Stack 基线
+## Step 13：发现 MEX 命令并建立 Log Writer Stack 基线
 
 完成 `.chain` 验证后，学员先逐条手工执行以下步骤。每个命令必须单独运行：
 
@@ -418,7 +399,7 @@ C:\Program Files\PackageManagement\NuGet\Packages\WinDbgCs.3.2.7\WinDbgCsExt.dll
 
 对于已验证的 `SQLDump0016.mdmp`，历史比较基线是一个匹配 thread，且 native stack 包含 `sqlmin!SQLServerLogMgr::LogWriter`。历史 debugger thread ID `21` 只能用于课后比较，不能用于下一次 thread selection。
 
-## Step 15：确认 SQL Server Build 并发现 WinDbgCs Scripts
+## Step 14：确认 SQL Server Build 并发现 WinDbgCs Scripts
 
 先单独执行：
 
@@ -444,7 +425,7 @@ lmv m sqlservr
 
 如果 scripts 已加载，则跳过安装。本阶段只学习 catalog/help；需要执行诊断 dscript 或解释 SQL Server 状态时，再切换到 **agent_lab1**。
 
-## Step 16：Prompt + WinDbg MCP 自动复现
+## Step 15：Prompt + WinDbg MCP 自动复现
 
 手工基线讲解完成后，再演示 Prompt 自动化，不能用 Prompt 代替学员理解前面的命令：
 
@@ -473,7 +454,7 @@ lmv m sqlservr
 | Native stack | 独立 `k` | WinDbg-unwound call chain |
 | Raw stack scan | 独立 `!mex.t -raw` | 同一 thread 的 stack-pointer-to-base output |
 
-## Step 17：完成环境验证并进入 Lab 1
+## Step 16：完成环境验证并进入 Lab 1
 
 1. 再次单独执行 `.chain`，确认两个准确 extension paths 仍存在。
 2. 如果打开了 command log，执行 `.logfile` 确认状态，然后执行 `.logclose`。

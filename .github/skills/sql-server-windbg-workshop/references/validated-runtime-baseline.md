@@ -14,21 +14,20 @@ The process ID and pipe are dynamic and must never be used to select a future se
 
 ## Fixed execution order
 
-After current-session identification and connection, use one debugger command per MCP execution:
+This section records the validated order for comparison. It is not an executable command source. Copy every static command verbatim from [06-WinDbg-Load-Commands.txt](../../../workshop/setup/steps/06-WinDbg-Load-Commands.txt); never reconstruct a command from this baseline. After current-session identification and connection, use one debugger command per MCP execution:
 
-1. `.dumpdebug`
-2. `.sympath`
-3. `.load C:\tools\SqlDebugWorkshop\extensions\mex.dll`
-4. `.load C:\Program Files\PackageManagement\NuGet\Packages\WinDbgCs.3.2.7\WinDbgCsExt.dll`
-5. `.chain`
-6. `!mex.help`
-7. `!us logwriter`
-8. Select the runtime-returned thread only when it is not already current.
-9. `k`
-10. `!mex.t -raw`
-11. `lmv m sqlservr`
-12. Bare `!execute`
-13. `!execute ExternalScripts.Install ;` only if the current bare `!execute` output advertises it and the required scripts are absent.
+1. `.sympath`
+2. `.load C:\tools\SqlDebugWorkshop\extensions\mex.dll`
+3. `.load C:\Program Files\PackageManagement\NuGet\Packages\WinDbgCs.3.2.7\WinDbgCsExt.dll`
+4. `.chain`
+5. `!mex.help`
+6. `!us logwriter`
+7. Select the runtime-returned thread only when it is not already current.
+8. `k`
+9. `!mex.t -raw`
+10. `lmv m sqlservr`
+11. Bare `!execute`
+12. `!execute ExternalScripts.Install ;` only if the current bare `!execute` output advertises it and the required scripts are absent.
 
 When command logging is taught, run `.logopen`, `.logfile`, and `.logclose` separately. Do not combine them with another command.
 
