@@ -44,11 +44,11 @@ Use the [directory layout](./setup/DIRECTORY-LAYOUT.md) as the canonical placeme
 ## Step 1 — Connect to VPN and start SQL Server WinDbg Instructor
 
 1. Connect to the Microsoft corporate VPN and confirm access to the internal share.
-2. In the VS Code Chat Agent picker, select **SQL Server WinDbg Instructor**. Its customization is stored in [sql-server-windbg-instructor.agent.md](../.github/agents/sql-server-windbg-instructor.agent.md); do not execute that Markdown file as a script.
+2. In the VS Code Chat Agent picker, select **SQL Server WinDbg Instructor**.
 3. Enter: `Validate the workshop environment and guide me through Setup in order`.
-4. The Agent orchestrates the documented sequence, runs side-effect-free validation, and explains evidence. Software installation, asset staging, and persistent configuration changes still require an explicit learner request.
+4. Follow the checkpoints shown in Chat. Confirm before continuing when a step installs software, stages assets, or changes persistent configuration.
 
-The Agent first runs the actual source-assets validation script from the repository root:
+The environment check runs this source-assets script from the repository root:
 
 `workshop\setup\steps\01-Test-SourceAssets.ps1`
 
@@ -78,20 +78,21 @@ Run:
 
 The script first checks whether `WinDbgCs` version `3.2.7` is already installed. It avoids the confusing silent reinstall behavior and verifies the package after installation.
 
-## Step 5 — Have the Agent run the complete-environment validation script
+## Step 5 — Validate the complete environment
 
-This is not a choice between using the Agent and using the script:
+Enter this request in Chat:
 
-- **SQL Server WinDbg Instructor** provides teaching, ordering, and evidence interpretation.
-- `04-Test-Installation.ps1` is the deterministic mechanism that performs the environment checks.
+```text
+Run the complete environment validation and explain each result
+```
 
-Ask the Agent to run:
+The validation uses this script:
 
 `workshop\setup\steps\04-Test-Installation.ps1`
 
-If the current Chat cannot execute local commands, run the same script manually from the repository root and provide its complete output to the Agent. Do not continue until every row passes.
+If Chat cannot execute local commands, run the same script manually from the repository root and paste its complete output into Chat. Do not continue until every row passes.
 
-The Agent records `Observation`, `Evidence`, `Interpretation`, `Confidence`, `Does not prove`, and `Next checkpoint`. A passing script proves only that local prerequisites are ready; it does not prove that the dump is open, MCP is connected, or either extension is runtime-loaded. Phase 2 must prove those facts again.
+Results are presented as `Observation`, `Evidence`, `Interpretation`, `Confidence`, `Does not prove`, and `Next checkpoint`. A passing script proves only that local prerequisites are ready; it does not prove that the dump is open, MCP is connected, or either extension is runtime-loaded. Phase 2 proves those facts again.
 
 ## Step 6 — Configure symbols and source server
 
@@ -123,7 +124,7 @@ Do not set the machine scope unless all users on the machine should share the sa
 
 Phase 1 proves that local files, packages, and environment values are ready. Phase 2 proves that the target dump is open in WinDbg, MCP is connected to the exact session, and the extensions are runtime-loaded. Execute one debugger command per WinDbg MCP execution; never combine adjacent checkpoints.
 
-Use the same teaching report for every checkpoint:
+When reading each checkpoint, focus on:
 
 - `Observation`: what the current execution returned.
 - `Evidence`: the relevant runtime output.
@@ -257,7 +258,7 @@ After `.chain` succeeds, teach the learner to run each command separately:
 8. Run `!mex.t -raw` and preserve the MEX stack-pointer-to-base scan.
 9. Compare the outputs: `k` reconstructs a call chain using current thread/register context, unwind metadata, and symbols. `!mex.t -raw` scans for symbolizable potential code pointers between stack pointer and stack base; not every line is an unwind-validated frame.
 
-A longer `!mex.t -raw` result does not mean MEX added dump memory, repaired the dump, or proved native symbols wrong. Setup teaches presentation differences only; send stack diagnosis to `agent_lab1`.
+A longer `!mex.t -raw` result does not mean MEX added dump memory, repaired the dump, or proved native symbols wrong. This phase compares presentation differences only; it does not diagnose root cause.
 
 For the validated `SQLDump0016.mdmp`, the historical baseline had one matching thread and a native stack containing `sqlmin!SQLServerLogMgr::LogWriter`. Historical debugger thread `21` is comparison evidence only and must never be used for a future selection.
 
@@ -285,7 +286,7 @@ Only when bare `!execute` advertises the following initialization action and req
 !execute ExternalScripts.Install ;
 ```
 
-Skip installation when scripts are already loaded. Setup may teach catalog/help discovery; diagnostic dscript execution and interpretation belong to `agent_lab1`.
+Skip installation when scripts are already loaded. This phase covers catalog/help discovery only. Switch to **agent_lab1** when diagnostic dscript execution or SQL Server state interpretation is required.
 
 ## Step 16 — Reproduce the baseline with Prompt + WinDbg MCP
 
@@ -312,13 +313,13 @@ After the manual sequence is understood:
 | Native stack | Standalone `k` | WinDbg-unwound call chain |
 | Raw stack scan | Standalone `!mex.t -raw` | Stack-pointer-to-base output for the same thread |
 
-## Step 17 — Close the runtime gate and hand off
+## Step 17 — Complete environment validation and continue to Lab 1
 
 1. Execute `.chain` separately again and verify that both exact extension paths remain present.
 2. If command logging was opened, run `.logfile` to verify state and then `.logclose`.
 3. Summarize facts proven in this session, remaining unknowns, and differences from the validated baseline.
-4. Report the Setup runtime gate as passed only when current evidence proves the dump/session, symbols, both extensions, filtered Log Writer thread, and both stack presentations.
-5. Hand stack interpretation, source correlation, and root-cause investigation to `agent_lab1`.
+4. Confirm that current runtime evidence covers the dump/session, symbols, both extensions, filtered Log Writer thread, and both stack presentations.
+5. After validation passes, select **agent_lab1** in the Agent picker to continue with stack interpretation, source correlation, and root-cause investigation.
 
 # Reference appendices
 

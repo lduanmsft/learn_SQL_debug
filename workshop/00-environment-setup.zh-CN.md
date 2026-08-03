@@ -84,11 +84,11 @@ WinDbg installer 的 Microsoft 内部来源为：
 ## Step 1：连接 VPN 并启动 SQL Server WinDbg Instructor Agent
 
 1. 连接 Microsoft corporate VPN，并确认当前账户具有内部共享目录权限。
-2. 在 VS Code Chat 的 Agent picker 中选择 **SQL Server WinDbg Instructor**。对应的 customization 定义保存在 [sql-server-windbg-instructor.agent.md](../.github/agents/sql-server-windbg-instructor.agent.md)；不要把该 Markdown 文件当作脚本直接执行。
+2. 在 VS Code Chat 的 Agent picker 中选择 **SQL Server WinDbg Instructor**。
 3. 输入：`验证 Workshop 环境并按顺序指导我完成 Setup`。
-4. Agent 负责按本文档编排检查、执行无副作用的验证命令并解释证据。安装软件、staging assets 或修改持久配置时，Agent 必须先得到学员明确请求。
+4. 按 Chat 中显示的 checkpoint 逐步完成检查。需要安装软件、staging assets 或修改持久配置时，请先确认再继续。
 
-Agent 首先在仓库根目录运行实际的 source-assets 检查脚本：
+环境检查会在仓库根目录运行以下 source-assets 脚本：
 
 在仓库根目录运行：
 
@@ -214,20 +214,21 @@ C:\tools\SqlDebugWorkshop\source-server\srcsrv.default.ini
 
 不要在未经批准时修改 Machine scope，以免影响机器上的其他用户。
 
-## Step 6：由 Agent 调用脚本验证完整环境
+## Step 6：验证完整环境
 
-这里不是在“使用 Agent”和“使用脚本”之间二选一：
+在 Chat 中输入：
 
-- **SQL Server WinDbg Instructor** 是教学、顺序控制和证据解释入口。
-- `04-Test-Installation.ps1` 是执行实际环境检查的确定性验证机制。
+```text
+运行完整环境验证并逐项解释结果
+```
 
-要求 Agent 运行以下脚本并逐项解释结果：
+检查过程中实际运行的验证脚本是：
 
 ```powershell
 .\workshop\setup\steps\04-Test-Installation.ps1
 ```
 
-如果当前 Chat 无法执行本地命令，学员可以在仓库根目录手工运行同一脚本，并把完整输出交给 Agent 解释；验证标准不变。
+如果 Chat 无法执行本地命令，请在仓库根目录手工运行同一脚本，再把完整输出粘贴到 Chat 中进行解释；验证标准不变。
 
 必须确认所有检查项均为 `True`：
 
@@ -240,13 +241,13 @@ C:\tools\SqlDebugWorkshop\source-server\srcsrv.default.ini
 - 用户级 `SRCSRV_INI_FILE`。
 - Asset inventory。
 
-Agent 应使用统一 checkpoint 格式记录 `Observation`、`Evidence`、`Interpretation`、`Confidence`、`Does not prove` 和 `Next checkpoint`。脚本通过只证明本地 prerequisites 已准备好，不证明 dump 已打开、MCP 已连接或 extensions 已 runtime-loaded；这些事实必须在阶段二重新验证。
+检查结果会按 `Observation`、`Evidence`、`Interpretation`、`Confidence`、`Does not prove` 和 `Next checkpoint` 展示。脚本通过只证明本地 prerequisites 已准备好，不证明 dump 已打开、MCP 已连接或 extensions 已 runtime-loaded；这些事实将在阶段二重新验证。
 
 # 阶段二：打开 Dump 并连接 WinDbg MCP
 
 阶段一只证明本地文件、package 和环境变量已经准备好；阶段二才证明目标 dump 已在 WinDbg 中打开、MCP 已连接到准确 session，并且 extension 已在该 runtime 中加载。每个 debugger command 必须单独执行，不能把相邻命令合并为一次 MCP execution。
 
-每个 checkpoint 的教学输出统一使用：
+阅读每个 checkpoint 时，请关注：
 
 - `Observation`：本次实际观察到什么。
 - `Evidence`：支持观察结果的 runtime 输出。
@@ -409,7 +410,7 @@ C:\Program Files\PackageManagement\NuGet\Packages\WinDbgCs.3.2.7\WinDbgCsExt.dll
 8. 执行 `!mex.t -raw`，保存 MEX 从 stack pointer 到 stack base 的 raw scan。
 9. 对比两者：`k` 使用当前 thread/register context、unwind metadata 和 symbols 重建 call chain；`!mex.t -raw` 扫描 stack pointer 到 stack base 之间可符号化的潜在 code pointers，其中不一定都是经过 unwind 验证的 frame。
 
-`!mex.t -raw` 输出更长，不表示 MEX 添加了 dump memory、修复了 dump、或证明 native symbols 错误。Setup 阶段只教学 presentation difference；stack 诊断转交 `agent_lab1`。
+`!mex.t -raw` 输出更长，不表示 MEX 添加了 dump memory、修复了 dump、或证明 native symbols 错误。本阶段只比较 presentation difference，不分析 root cause。
 
 对于已验证的 `SQLDump0016.mdmp`，历史比较基线是一个匹配 thread，且 native stack 包含 `sqlmin!SQLServerLogMgr::LogWriter`。历史 debugger thread ID `21` 只能用于课后比较，不能用于下一次 thread selection。
 
@@ -437,7 +438,7 @@ lmv m sqlservr
 !execute ExternalScripts.Install ;
 ```
 
-如果 scripts 已加载，则跳过安装。Setup Agent 可以解释 catalog/help；诊断 dscript 的执行和结果解释属于 `agent_lab1`。
+如果 scripts 已加载，则跳过安装。本阶段只学习 catalog/help；需要执行诊断 dscript 或解释 SQL Server 状态时，再切换到 **agent_lab1**。
 
 ## Step 16：Prompt + WinDbg MCP 自动复现
 
@@ -465,13 +466,13 @@ lmv m sqlservr
 | Native stack | 独立 `k` | WinDbg-unwound call chain |
 | Raw stack scan | 独立 `!mex.t -raw` | 同一 thread 的 stack-pointer-to-base output |
 
-## Step 17：结束 Runtime Gate 并交接
+## Step 17：完成环境验证并进入 Lab 1
 
 1. 再次单独执行 `.chain`，确认两个准确 extension paths 仍存在。
 2. 如果打开了 command log，执行 `.logfile` 确认状态，然后执行 `.logclose`。
 3. 汇总本次 session 已证明的事实、仍未知的内容，以及与 validated baseline 的差异。
-4. 只有当 dump/session、symbols、两个 extensions、filtered Log Writer thread 和两种 stack view 均有当前 runtime evidence 时，才报告 Setup runtime gate 通过。
-5. 后续 stack interpretation、source correlation 和 root-cause investigation 切换到 `agent_lab1`。
+4. 确认 dump/session、symbols、两个 extensions、filtered Log Writer thread 和两种 stack view 均有当前 runtime evidence。
+5. 环境验证通过后，在 Agent picker 中切换到 **agent_lab1**，继续 stack interpretation、source correlation 和 root-cause investigation。
 
 # 参考附录
 
